@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "description": "JSON-RPC 2.0 request schema",
+
+  "type": "object",
+  "required": ["jsonrpc", "method"],
+  "additionalProperties": false,
+  "properties": {
+    "jsonrpc": {
+      "type": "string",
+      "enum": ["2.0"]
+    },
+    "method": {
+      "type": "string"
+    },
+    "params": {
+      "type": ["array", "object"]
+    },
+    "id": {
+      "type": ["integer", "string", "null"]
+    }
+  }
+}

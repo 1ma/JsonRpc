@@ -1,0 +1,7 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "description": "First pass validation",
+
+  "type": ["array", "object"],
+  "minItems": 1
+}
