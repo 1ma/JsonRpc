@@ -17,7 +17,7 @@
       "type": ["array", "object"]
     },
     "id": {
-      "type": ["integer", "string", "null"]
+      "type": ["integer", "string"]
     }
   }
 }
