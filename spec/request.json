@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/schema#",
-  "description": "JSON-RPC 2.0 request schema",
+  "description": "JSON-RPC 2.0 single request schema",
 
   "type": "object",
   "required": ["jsonrpc", "method"],

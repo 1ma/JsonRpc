@@ -16,10 +16,22 @@ class Input
      */
     private $error;
 
-    public function __construct(string $raw)
+    private function __construct($data, int $error)
     {
-        $this->data = \json_decode($raw);
-        $this->error = \json_last_error();
+        $this->data = $data;
+        $this->error = $error;
+    }
+
+    public static function fromString(string $raw): Input
+    {
+        return new static(\json_decode($raw), \json_last_error());
+    }
+
+    public static function fromSafeData($data): Input
+    {
+        \assert(false !== \json_encode($data));
+
+        return new static($data, JSON_ERROR_NONE);
     }
 
     /**

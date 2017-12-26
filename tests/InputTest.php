@@ -12,12 +12,12 @@ class InputTest extends TestCase
     /**
      * @dataProvider validInputsProvider
      */
-    public function testValidInputs(string $in)
+    public function testValidInputs(string $raw)
     {
-        $sut = new Input($in);
+        $sut = Input::fromString($raw);
 
         self::assertTrue($sut->parsable());
-        self::assertEquals($sut->decoded(), \json_decode($in));
+        self::assertEquals($sut->decoded(), \json_decode($raw));
 
         self::assertTrue($sut->isSingle() || $sut->isBatch());
     }
@@ -38,7 +38,7 @@ class InputTest extends TestCase
      */
     public function testInputParseError(string $raw)
     {
-        $sut = new Input($raw);
+        $sut = Input::fromString($raw);
 
         self::assertFalse($sut->parsable());
         self::assertNull($sut->decoded());
@@ -59,12 +59,12 @@ class InputTest extends TestCase
     /**
      * @dataProvider invalidInputsProvider
      */
-    public function testInvalidInputs(string $in)
+    public function testInvalidInputs(string $raw)
     {
-        $sut = new Input($in);
+        $sut = Input::fromString($raw);
 
         self::assertTrue($sut->parsable());
-        self::assertEquals($sut->decoded(), \json_decode($in));
+        self::assertEquals($sut->decoded(), \json_decode($raw));
 
         self::assertFalse($sut->isSingle());
         self::assertFalse($sut->isBatch());
