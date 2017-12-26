@@ -21,12 +21,12 @@ class Success extends Response
         $this->result = $result;
     }
 
-    public function __toString()
+    public function jsonSerialize(): array
     {
-        return \json_encode([
+        return [
             'jsonrpc' => '2.0',
             'result' => $this->result,
             'id' => $this->id
-        ]);
+        ];
     }
 }

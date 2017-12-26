@@ -76,7 +76,7 @@ class Error extends Response
         return new static(-32603, $id);
     }
 
-    public function __toString()
+    public function jsonSerialize(): array
     {
         $response = [
             'jsonrpc' => '2.0',
@@ -91,6 +91,6 @@ class Error extends Response
             $response['error']['data'] = $this->data;
         }
 
-        return \json_encode($response);
+        return $response;
     }
 }

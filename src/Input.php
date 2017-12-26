@@ -4,11 +4,7 @@ declare(strict_types=1);
 
 namespace UMA\RPC;
 
-/**
- * Payload objects decode raw JSON payloads and answer
- * relevant questions about it.
- */
-class Payload
+class Input
 {
     /**
      * @var mixed
@@ -37,7 +33,7 @@ class Payload
     }
 
     /**
-     * Returns whether the raw payload was a valid JSON
+     * Returns whether the raw input was a valid JSON
      * string and therefore could be decoded, or not.
      */
     public function parsable(): bool
@@ -46,7 +42,7 @@ class Payload
     }
 
     /**
-     * Returns whether the decoded payload _looks like_
+     * Returns whether the decoded input _looks like_
      * a single Remote Procedure Call.
      */
     public function isSingle(): bool
@@ -55,7 +51,7 @@ class Payload
     }
 
     /**
-     * Returns whether the decoded payload _looks like_
+     * Returns whether the decoded input _looks like_
      * a batch Remote Procedure Call.
      */
     public function isBatch(): bool

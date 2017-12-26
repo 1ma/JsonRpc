@@ -13,32 +13,37 @@ class ErrorTest extends TestCase
     {
         self::assertSame(
             '{"jsonrpc":"2.0","error":{"code":-32700,"message":"Parse error"},"id":null}',
-            (string) Error::parsing()
+            \json_encode(Error::parsing())
         );
 
         self::assertSame(
             '{"jsonrpc":"2.0","error":{"code":-32600,"message":"Invalid Request"},"id":null}',
-            (string) Error::invalidRequest()
+            \json_encode(Error::invalidRequest())
         );
 
         self::assertSame(
             '{"jsonrpc":"2.0","error":{"code":-32601,"message":"Method not found"},"id":"123"}',
-            (string) Error::unknownMethod('123')
+            \json_encode(Error::unknownMethod('123'))
         );
 
         self::assertSame(
             '{"jsonrpc":"2.0","error":{"code":-32602,"message":"Invalid params"},"id":123}',
-            (string) Error::invalidParams(123)
+            \json_encode(Error::invalidParams(123))
         );
 
         self::assertSame(
             '{"jsonrpc":"2.0","error":{"code":-32603,"message":"Internal error"},"id":"abc"}',
-            (string) Error::internal('abc')
+            \json_encode(Error::internal('abc'))
         );
 
         self::assertSame(
             '{"jsonrpc":"2.0","error":{"code":-32000,"message":"Server error","data":"Division by zero"},"id":1}',
-            (string) Error::userDefined(1, 'Division by zero')
+            \json_encode(Error::userDefined(1, 'Division by zero'))
+        );
+
+        self::assertSame(
+            '[{"jsonrpc":"2.0","error":{"code":-32700,"message":"Parse error"},"id":null},{"jsonrpc":"2.0","error":{"code":-32601,"message":"Method not found"},"id":"123"}]',
+            \json_encode([Error::parsing(), Error::unknownMethod('123')])
         );
     }
 }

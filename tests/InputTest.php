@@ -5,27 +5,16 @@ declare(strict_types=1);
 namespace UMA\RPC\Tests;
 
 use PHPUnit\Framework\TestCase;
-use UMA\RPC\Payload;
+use UMA\RPC\Input;
 
-class PayloadTest extends TestCase
+class InputTest extends TestCase
 {
-    public function testPayloadParseError()
-    {
-        $sut = new Payload('}"jsonrpc":"2.0');
-
-        self::assertFalse($sut->parsable());
-        self::assertNull($sut->decoded());
-
-        self::assertFalse($sut->isSingle());
-        self::assertFalse($sut->isBatch());
-    }
-
     /**
-     * @dataProvider validPayloadsProvider
+     * @dataProvider validInputsProvider
      */
-    public function testValidPayloads(string $in)
+    public function testValidInputs(string $in)
     {
-        $sut = new Payload($in);
+        $sut = new Input($in);
 
         self::assertTrue($sut->parsable());
         self::assertEquals($sut->decoded(), \json_decode($in));
@@ -33,7 +22,7 @@ class PayloadTest extends TestCase
         self::assertTrue($sut->isSingle() || $sut->isBatch());
     }
 
-    public function validPayloadsProvider(): array
+    public function validInputsProvider(): array
     {
         return [
             'empty object' => ['{}'],
@@ -45,11 +34,34 @@ class PayloadTest extends TestCase
     }
 
     /**
-     * @dataProvider invalidPayloadsProvider
+     * @dataProvider parseErrorProvider
      */
-    public function testInvalidPayloads(string $in)
+    public function testInputParseError(string $raw)
     {
-        $sut = new Payload($in);
+        $sut = new Input($raw);
+
+        self::assertFalse($sut->parsable());
+        self::assertNull($sut->decoded());
+
+        self::assertFalse($sut->isSingle());
+        self::assertFalse($sut->isBatch());
+    }
+
+    public function parseErrorProvider(): array
+    {
+        return [
+            [''],
+            ['}"jsonrpc":"2.0'],
+            [random_bytes(6)]
+        ];
+    }
+
+    /**
+     * @dataProvider invalidInputsProvider
+     */
+    public function testInvalidInputs(string $in)
+    {
+        $sut = new Input($in);
 
         self::assertTrue($sut->parsable());
         self::assertEquals($sut->decoded(), \json_decode($in));
@@ -58,7 +70,7 @@ class PayloadTest extends TestCase
         self::assertFalse($sut->isBatch());
     }
 
-    public function invalidPayloadsProvider(): array
+    public function invalidInputsProvider(): array
     {
         return [
             'null' => ['null'],
