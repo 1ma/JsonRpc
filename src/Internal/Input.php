@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace UMA\RPC\Internal;
 
-use League\JsonGuard\Validator;
-
 class Input
 {
     /**
@@ -21,17 +19,16 @@ class Input
     /**
      * @var bool
      */
-    private $konforms;
+    private $isRpcRequest;
 
     private function __construct($data, int $error)
     {
         $this->data = $data;
         $this->error = $error;
 
-        $this->konforms = $this->parsable() && (new Validator(
-            $this->decoded(),
+        $this->isRpcRequest = $this->parsable() && (new Guard(
             \json_decode(file_get_contents(__DIR__.'/../../spec/request.json'))
-        ))->passes();
+        ))($this->decoded());
     }
 
     public static function fromString(string $raw): Input
@@ -46,45 +43,22 @@ class Input
         return new static($data, JSON_ERROR_NONE);
     }
 
-    /**
-     * Returns the decoded JSON data.
-     *
-     * @return mixed
-     */
     public function decoded()
     {
         return $this->data;
     }
-
-    /**
-     * Returns whether the raw input was a valid JSON
-     * string and therefore could be decoded, or not.
-     */
     public function parsable(): bool
     {
         return JSON_ERROR_NONE === $this->error;
     }
 
-    /**
-     * Returns whether the decoded input _looks like_
-     * a single Remote Procedure Call.
-     */
-    public function isSingle(): bool
-    {
-        return $this->data instanceof \stdClass;
-    }
-
-    /**
-     * Returns whether the decoded input _looks like_
-     * a batch Remote Procedure Call.
-     */
-    public function isBatch(): bool
+    public function isArray(): bool
     {
         return \is_array($this->data) && !empty($this->data);
     }
 
-    public function konforms(): bool
+    public function isRpcRequest(): bool
     {
-        return $this->konforms;
+        return $this->isRpcRequest;
     }
 }

@@ -19,14 +19,12 @@ class InputTest extends TestCase
         self::assertTrue($sut->parsable());
         self::assertEquals($sut->decoded(), \json_decode($raw));
 
-        self::assertTrue($sut->isSingle() || $sut->isBatch());
+        self::assertTrue($sut->isArray() || $sut->isRpcRequest());
     }
 
     public function validInputsProvider(): array
     {
         return [
-            'empty object' => ['{}'],
-            'derpy object' => ['{"foo":123}'],
             'non empty array' => ['["wut"]'],
             'valid request' => ['{"jsonrpc": "2.0", "method": "subtract", "params": [42, 23], "id": 1}'],
             'valid batch request' => ['[{"jsonrpc": "2.0", "method": "subtract", "params": [42, 23], "id": 1}]']
@@ -43,8 +41,7 @@ class InputTest extends TestCase
         self::assertFalse($sut->parsable());
         self::assertNull($sut->decoded());
 
-        self::assertFalse($sut->isSingle());
-        self::assertFalse($sut->isBatch());
+        self::assertFalse($sut->isArray());
     }
 
     public function parseErrorProvider(): array
@@ -66,8 +63,7 @@ class InputTest extends TestCase
         self::assertTrue($sut->parsable());
         self::assertEquals($sut->decoded(), \json_decode($raw));
 
-        self::assertFalse($sut->isSingle());
-        self::assertFalse($sut->isBatch());
+        self::assertFalse($sut->isArray());
     }
 
     public function invalidInputsProvider(): array

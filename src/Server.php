@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace UMA\RPC;
 
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use UMA\RPC\Internal\Guard;
 use UMA\RPC\Internal\Input;
 use UMA\RPC\Internal\Request;
 
@@ -28,12 +31,8 @@ class Server
 
     public function add(string $method, string $serviceId): Server
     {
-        if (isset($this->methods[$method])) {
-            throw new \LogicException('');
-        }
-
         if (!$this->container->has($serviceId)) {
-            throw new \LogicException('');
+            throw new \LogicException("Cannot find service '$serviceId' in the container");
         }
 
         $this->methods[$method] = $serviceId;
@@ -49,20 +48,16 @@ class Server
             return \json_encode(Error::parsing());
         }
 
-        if ($input->isSingle()) {
-            return $this->processSingle($input);
+        if ($input->isArray()) {
+            return $this->batch($input);
         }
 
-        if ($input->isBatch()) {
-            return $this->processBatch($input);
-        }
-
-        return \json_encode(Error::invalidRequest());
+        return $this->single($input);
     }
 
-    private function processSingle(Input $input): ?string
+    private function single(Input $input): ?string
     {
-        if (!$input->konforms()) {
+        if (!$input->isRpcRequest()) {
             return \json_encode(Error::invalidRequest());
         }
 
@@ -87,13 +82,20 @@ class Server
                 null : \json_encode(Error::internal($request->id()));
         }
 
+        $schema = $procedure->paramSpec();
+
+        if (null !== $schema && !(new Guard($schema))($request->params())) {
+            return null === $request->id() ?
+                null : \json_encode(Error::invalidParams($request->id()));
+        }
+
         $response = $procedure->execute($request);
 
         return null === $request->id() ?
             null : \json_encode($response);
     }
 
-    private function processBatch(Input $input): ?string
+    private function batch(Input $input): ?string
     {
         \assert(\is_array($input->decoded()));
 
@@ -101,7 +103,7 @@ class Server
         foreach ($input->decoded() as $request) {
             $pseudoInput = Input::fromSafeData($request);
 
-            if(null !== $response = $this->processSingle($pseudoInput)) {
+            if(null !== $response = $this->single($pseudoInput)) {
                 $responses[] = $response;
             }
         }

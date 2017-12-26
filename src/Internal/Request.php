@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace UMA\RPC\Internal;
 
 class Request
@@ -21,7 +23,7 @@ class Request
 
     public function __construct(Input $input)
     {
-        \assert($input->konforms());
+        \assert($input->isRpcRequest());
 
         $this->id = $input->decoded()->id ?? null;
         $this->method = $input->decoded()->method;
