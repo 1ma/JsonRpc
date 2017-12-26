@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace UMA\RPC\Tests;
+namespace UMA\RPC\Tests\Internal;
 
 use PHPUnit\Framework\TestCase;
-use UMA\RPC\Input;
+use UMA\RPC\Internal\Input;
 
 class InputTest extends TestCase
 {

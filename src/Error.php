@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace UMA\RPC;
 
+use UMA\RPC\Internal\Response;
+
 class Error extends Response
 {
     private const ERROR_TABLE = [

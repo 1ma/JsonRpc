@@ -1,6 +1,6 @@
 <?php
 
-namespace UMA\RPC;
+namespace UMA\RPC\Internal;
 
 class Request
 {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace UMA\RPC;
+namespace UMA\RPC\Internal;
 
 abstract class Response implements \JsonSerializable
 {

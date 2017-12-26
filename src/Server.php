@@ -5,6 +5,8 @@ namespace UMA\RPC;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use UMA\RPC\Internal\Input;
+use UMA\RPC\Internal\Request;
 
 class Server
 {

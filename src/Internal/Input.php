@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace UMA\RPC;
+namespace UMA\RPC\Internal;
 
 use League\JsonGuard\Validator;
 
@@ -30,7 +30,7 @@ class Input
 
         $this->konforms = $this->parsable() && (new Validator(
             $this->decoded(),
-            \json_decode(file_get_contents(__DIR__.'/../spec/request.json'))
+            \json_decode(file_get_contents(__DIR__.'/../../spec/request.json'))
         ))->passes();
     }
 
