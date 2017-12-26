@@ -18,18 +18,10 @@ class Server
      */
     private $methods;
 
-    /**
-     * @var Guard
-     */
-    private $rqGuard;
-
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
         $this->methods = [];
-        $this->rqGuard = new Guard(\json_decode(
-            \file_get_contents(__DIR__ . '/../spec/request.json')
-        ));
     }
 
     public function add(string $method, string $serviceId): Server
@@ -68,34 +60,34 @@ class Server
 
     private function processSingle(Input $input): ?string
     {
-        if (!($this->rqGuard)($input->decoded())) {
+        if (!$input->konforms()) {
             return \json_encode(Error::invalidRequest());
         }
 
         $request = new Request($input);
 
-        if (!isset($this->methods[$request->getMethod()])) {
-            return null === $request->getId() ?
-                null : \json_encode(Error::unknownMethod($request->getId()));
+        if (!isset($this->methods[$request->method()])) {
+            return null === $request->id() ?
+                null : \json_encode(Error::unknownMethod($request->id()));
         }
 
-        $serviceId = $this->methods[$request->getMethod()];
+        $serviceId = $this->methods[$request->method()];
 
         try {
             $procedure = $this->container->get($serviceId);
         } catch (ContainerExceptionInterface|NotFoundExceptionInterface $e) {
-            return null === $request->getId() ?
-                null : \json_encode(Error::internal($request->getId()));
+            return null === $request->id() ?
+                null : \json_encode(Error::internal($request->id()));
         }
 
         if (!$procedure instanceof Procedure) {
-            return null === $request->getId() ?
-                null : \json_encode(Error::internal($request->getId()));
+            return null === $request->id() ?
+                null : \json_encode(Error::internal($request->id()));
         }
 
         $response = $procedure->execute($request);
 
-        return null === $request->getId() ?
+        return null === $request->id() ?
             null : \json_encode($response);
     }
 

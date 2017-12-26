@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace UMA\RPC;
 
+use League\JsonGuard\Validator;
+
 class Input
 {
     /**
@@ -16,10 +18,20 @@ class Input
      */
     private $error;
 
+    /**
+     * @var bool
+     */
+    private $konforms;
+
     private function __construct($data, int $error)
     {
         $this->data = $data;
         $this->error = $error;
+
+        $this->konforms = $this->parsable() && (new Validator(
+            $this->decoded(),
+            \json_decode(file_get_contents(__DIR__.'/../spec/request.json'))
+        ))->passes();
     }
 
     public static function fromString(string $raw): Input
@@ -69,5 +81,10 @@ class Input
     public function isBatch(): bool
     {
         return \is_array($this->data) && !empty($this->data);
+    }
+
+    public function konforms(): bool
+    {
+        return $this->konforms;
     }
 }

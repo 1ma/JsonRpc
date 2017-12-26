@@ -19,27 +19,24 @@ class Request
      */
     private $params;
 
-    /**
-     * Precondition: $input has passed request.json validation.
-     */
     public function __construct(Input $input)
     {
-        $input = $input->decoded();
+        \assert($input->konforms());
 
-        $this->id = $input->id ?? null;
-        $this->method = $input->method;
-        $this->params = $input->params ?? null;
+        $this->id = $input->decoded()->id ?? null;
+        $this->method = $input->decoded()->method;
+        $this->params = $input->decoded()->params ?? null;
     }
 
     /**
      * @return int|string|null
      */
-    public function getId()
+    public function id()
     {
         return $this->id;
     }
 
-    public function getMethod(): string
+    public function method(): string
     {
         return $this->method;
     }
@@ -47,7 +44,7 @@ class Request
     /**
      * @return \stdClass|array|null
      */
-    public function getParams()
+    public function params()
     {
         return $this->params;
     }
