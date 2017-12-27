@@ -65,12 +65,12 @@ class Server
             $pseudoInput = Input::fromSafeData($request);
 
             if(null !== $response = $this->single($pseudoInput)) {
-                $responses[] = \json_decode($response);
+                $responses[] = $response;
             }
         }
 
         return empty($responses) ?
-            null : \json_encode($responses);
+            null : \sprintf('[%s]', \implode(',', $responses));
     }
 
     private function single(Input $input): ?string
