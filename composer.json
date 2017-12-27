@@ -22,6 +22,12 @@
             "UMA\\RPC\\Tests\\": "tests/"
         }
     },
+    "scripts": {
+        "test": [
+            "@composer install",
+            "php -dzend.assertions=1 vendor/bin/phpunit"
+        ]
+    },
     "config": {
         "sort-packages": true
     }

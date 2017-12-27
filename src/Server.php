@@ -65,7 +65,7 @@ class Server
             $pseudoInput = Input::fromSafeData($request);
 
             if(null !== $response = $this->single($pseudoInput)) {
-                $responses[] = $response;
+                $responses[] = \json_decode($response);
             }
         }
 
