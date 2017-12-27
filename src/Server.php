@@ -10,6 +10,7 @@ use Psr\Container\NotFoundExceptionInterface;
 use UMA\RPC\Internal\Guard;
 use UMA\RPC\Internal\Input;
 use UMA\RPC\Internal\Request;
+use UMA\RPC\Internal\Response;
 
 class Server
 {
@@ -45,7 +46,7 @@ class Server
         $input = Input::fromString($raw);
 
         if (!$input->parsable()) {
-            return \json_encode(Error::parsing());
+            return $this->end(Error::parsing());
         }
 
         if ($input->isArray()) {
@@ -53,46 +54,6 @@ class Server
         }
 
         return $this->single($input);
-    }
-
-    private function single(Input $input): ?string
-    {
-        if (!$input->isRpcRequest()) {
-            return \json_encode(Error::invalidRequest());
-        }
-
-        $request = new Request($input);
-
-        if (!isset($this->methods[$request->method()])) {
-            return null === $request->id() ?
-                null : \json_encode(Error::unknownMethod($request->id()));
-        }
-
-        $serviceId = $this->methods[$request->method()];
-
-        try {
-            $procedure = $this->container->get($serviceId);
-        } catch (ContainerExceptionInterface|NotFoundExceptionInterface $e) {
-            return null === $request->id() ?
-                null : \json_encode(Error::internal($request->id()));
-        }
-
-        if (!$procedure instanceof Procedure) {
-            return null === $request->id() ?
-                null : \json_encode(Error::internal($request->id()));
-        }
-
-        $schema = $procedure->paramSpec();
-
-        if (null !== $schema && !(new Guard($schema))($request->params())) {
-            return null === $request->id() ?
-                null : \json_encode(Error::invalidParams($request->id()));
-        }
-
-        $response = $procedure->execute($request);
-
-        return null === $request->id() ?
-            null : \json_encode($response);
     }
 
     private function batch(Input $input): ?string
@@ -110,5 +71,44 @@ class Server
 
         return empty($responses) ?
             null : \json_encode($responses);
+    }
+
+    private function single(Input $input): ?string
+    {
+        if (!$input->isRpcRequest()) {
+            return $this->end(Error::invalidRequest());
+        }
+
+        $request = new Request($input);
+
+        if (!isset($this->methods[$request->method()])) {
+            return $this->end(Error::unknownMethod($request->id()), $request);
+        }
+
+        $serviceId = $this->methods[$request->method()];
+
+        try {
+            $procedure = $this->container->get($serviceId);
+        } catch (ContainerExceptionInterface|NotFoundExceptionInterface $e) {
+            return $this->end(Error::internal($request->id()), $request);
+        }
+
+        if (!$procedure instanceof Procedure) {
+            return $this->end(Error::internal($request->id()), $request);
+        }
+
+        $schema = $procedure->paramSpec();
+
+        if ($schema instanceof \stdClass && !(new Guard($schema))($request->params())) {
+            return $this->end(Error::invalidParams($request->id()), $request);
+        }
+
+        return $this->end($procedure->execute($request), $request);
+    }
+
+    private function end(Response $response, Request $request = null): ?string
+    {
+        return $request instanceof Request && null === $request->id() ?
+            null : \json_encode($response);
     }
 }

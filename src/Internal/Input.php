@@ -6,6 +6,8 @@ namespace UMA\RPC\Internal;
 
 class Input
 {
+    private const REQ_SCHEMA_PATH = __DIR__ . '/../../spec/request.json';
+
     /**
      * @var mixed
      */
@@ -16,19 +18,10 @@ class Input
      */
     private $error;
 
-    /**
-     * @var bool
-     */
-    private $isRpcRequest;
-
     private function __construct($data, int $error)
     {
         $this->data = $data;
         $this->error = $error;
-
-        $this->isRpcRequest = $this->parsable() && (new Guard(
-            \json_decode(file_get_contents(__DIR__.'/../../spec/request.json'))
-        ))($this->decoded());
     }
 
     public static function fromString(string $raw): Input
@@ -59,6 +52,8 @@ class Input
 
     public function isRpcRequest(): bool
     {
-        return $this->isRpcRequest;
+        return $this->parsable() && (new Guard(
+            \json_decode(file_get_contents(static::REQ_SCHEMA_PATH))
+        ))($this->data);
     }
 }

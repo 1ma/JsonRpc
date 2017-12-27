@@ -65,7 +65,7 @@ class Error extends Response
         return new static(-32602, $id);
     }
 
-    public static function userDefined($id, $data): Error
+    public static function custom($id, $data): Error
     {
         return new static(-32000, $id, $data);
     }

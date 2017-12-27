@@ -38,7 +38,7 @@ class ErrorTest extends TestCase
 
         self::assertSame(
             '{"jsonrpc":"2.0","error":{"code":-32000,"message":"Server error","data":"Division by zero"},"id":1}',
-            \json_encode(Error::userDefined(1, 'Division by zero'))
+            \json_encode(Error::custom(1, 'Division by zero'))
         );
 
         self::assertSame(
