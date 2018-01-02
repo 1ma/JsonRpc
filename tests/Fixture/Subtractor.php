@@ -25,7 +25,7 @@ class Subtractor implements Procedure
         return new Success($request->id(), $minuend - $subtrahend);
     }
 
-    public function paramSpec(): ?\stdClass
+    public function getSpec(): ?\stdClass
     {
         return \json_decode(<<<'JSON'
 {

@@ -20,7 +20,7 @@ class MockProcedure implements Procedure
         return new Success($request->id());
     }
 
-    public function paramSpec(): ?\stdClass
+    public function getSpec(): ?\stdClass
     {
         return null;
     }

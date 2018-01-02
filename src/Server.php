@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace UMA\RPC;
 
-use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
-use Psr\Container\NotFoundExceptionInterface;
 use UMA\RPC\Internal\Guard;
 use UMA\RPC\Internal\Input;
 use UMA\RPC\Internal\Request;
@@ -85,21 +83,15 @@ class Server
             return $this->end(Error::unknownMethod($request->id()), $request);
         }
 
-        $serviceId = $this->methods[$request->method()];
-
-        try {
-            $procedure = $this->container->get($serviceId);
-        } catch (ContainerExceptionInterface|NotFoundExceptionInterface $e) {
-            return $this->end(Error::internal($request->id()), $request);
-        }
+        $procedure = $this->container->get($this->methods[$request->method()]);
 
         if (!$procedure instanceof Procedure) {
             return $this->end(Error::internal($request->id()), $request);
         }
 
-        $schema = $procedure->paramSpec();
+        $spec = $procedure->getSpec();
 
-        if ($schema instanceof \stdClass && !(new Guard($schema))($request->params())) {
+        if ($spec instanceof \stdClass && !(new Guard($spec))($request->params())) {
             return $this->end(Error::invalidParams($request->id()), $request);
         }
 

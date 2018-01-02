@@ -14,5 +14,5 @@ interface Procedure
 {
     public function execute(Request $request): Response;
 
-    public function paramSpec(): ?\stdClass;
+    public function getSpec(): ?\stdClass;
 }
