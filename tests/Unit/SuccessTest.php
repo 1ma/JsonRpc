@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace UMA\RPC\Tests\Unit;
+namespace UMA\JsonRpc\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
-use UMA\RPC\Success;
+use UMA\JsonRpc\Success;
 
 class SuccessTest extends TestCase
 {

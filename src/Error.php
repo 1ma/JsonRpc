@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-namespace UMA\RPC;
-
-use UMA\RPC\Internal\Response;
+namespace UMA\JsonRpc;
 
 class Error extends Response
 {

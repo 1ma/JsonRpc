@@ -2,10 +2,7 @@
 
 declare(strict_types=1);
 
-namespace UMA\RPC;
-
-use UMA\RPC\Internal\Request;
-use UMA\RPC\Internal\Response;
+namespace UMA\JsonRpc;
 
 /**
  * Contract for JSON-RPC 2.0 procedures.

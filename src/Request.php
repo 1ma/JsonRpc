@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-namespace UMA\RPC\Internal;
+namespace UMA\JsonRpc;
+
+use UMA\JsonRpc\Internal\Input;
 
 class Request
 {

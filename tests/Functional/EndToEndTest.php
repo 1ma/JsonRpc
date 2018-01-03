@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace UMA\RPC\Tests\Functional;
+namespace UMA\JsonRpc\Tests\Functional;
 
 use PHPUnit\Framework\TestCase;
 use Pimple\Container;
 use Pimple\Psr11\Container as Psr11Decorator;
-use UMA\RPC\Procedure;
-use UMA\RPC\Server;
-use UMA\RPC\Tests\Fixture\Procedure\Adder;
-use UMA\RPC\Tests\Fixture\Procedure\Subtractor;
-use UMA\RPC\Tests\Fixture\Procedure\MockProcedure;
+use UMA\JsonRpc\Procedure;
+use UMA\JsonRpc\Server;
+use UMA\JsonRpc\Tests\Fixture\Procedure\Adder;
+use UMA\JsonRpc\Tests\Fixture\Procedure\Subtractor;
+use UMA\JsonRpc\Tests\Fixture\Procedure\MockProcedure;
 
 class EndToEndTest extends TestCase
 {

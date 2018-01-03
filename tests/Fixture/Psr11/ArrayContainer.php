@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace UMA\RPC\Tests\Fixture\Psr11;
+namespace UMA\JsonRpc\Tests\Fixture\Psr11;
 
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;

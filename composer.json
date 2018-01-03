@@ -1,6 +1,6 @@
 {
-    "name": "uma/rpc",
-    "description": "JSON-RPC 2.0 implementation",
+    "name": "uma/json-rpc",
+    "description": "a JSON-RPC 2.0 server",
     "license": "MIT",
     "type": "library",
     "require": {
@@ -14,12 +14,12 @@
     },
     "autoload": {
         "psr-4": {
-            "UMA\\RPC\\": "src/"
+            "UMA\\JsonRpc\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "UMA\\RPC\\Tests\\": "tests/"
+            "UMA\\JsonRpc\\Tests\\": "tests/"
         }
     },
     "scripts": {

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace UMA\RPC\Tests\Fixture\Procedure;
+namespace UMA\JsonRpc\Tests\Fixture\Procedure;
 
-use UMA\RPC\Internal\Request;
-use UMA\RPC\Internal\Response;
-use UMA\RPC\Procedure;
-use UMA\RPC\Success;
+use UMA\JsonRpc\Request;
+use UMA\JsonRpc\Response;
+use UMA\JsonRpc\Procedure;
+use UMA\JsonRpc\Success;
 
 class MockProcedure implements Procedure
 {

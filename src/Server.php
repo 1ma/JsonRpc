@@ -2,15 +2,13 @@
 
 declare(strict_types=1);
 
-namespace UMA\RPC;
+namespace UMA\JsonRpc;
 
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use UMA\RPC\Internal\Guard;
-use UMA\RPC\Internal\Input;
-use UMA\RPC\Internal\Request;
-use UMA\RPC\Internal\Response;
+use UMA\JsonRpc\Internal\Guard;
+use UMA\JsonRpc\Internal\Input;
 
 class Server
 {

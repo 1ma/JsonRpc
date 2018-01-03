@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace UMA\RPC\Tests\Unit;
+namespace UMA\JsonRpc\Tests\Unit;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerExceptionInterface;
-use UMA\RPC\Server;
-use UMA\RPC\Tests\Fixture\Procedure\Subtractor;
-use UMA\RPC\Tests\Fixture\Psr11\ArrayContainer;
+use UMA\JsonRpc\Server;
+use UMA\JsonRpc\Tests\Fixture\Procedure\Subtractor;
+use UMA\JsonRpc\Tests\Fixture\Psr11\ArrayContainer;
 
 class ServerTest extends TestCase
 {
