@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace UMA\RPC\Tests;
+namespace UMA\RPC\Tests\Functional;
 
 use PHPUnit\Framework\TestCase;
 use Pimple\Container;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace UMA\RPC\Tests;
+namespace UMA\RPC\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 use UMA\RPC\Error;

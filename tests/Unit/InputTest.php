@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace UMA\RPC\Tests\Internal;
+namespace UMA\RPC\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 use UMA\RPC\Internal\Input;
