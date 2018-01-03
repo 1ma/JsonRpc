@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace UMA\RPC\Tests;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Pimple\Container;
-use Pimple\Psr11\Container as Psr11Decorator;
+use Psr\Container\ContainerExceptionInterface;
 use UMA\RPC\Server;
-use UMA\RPC\Tests\Fixture\Adder;
-use UMA\RPC\Tests\Fixture\Subtractor;
+use UMA\RPC\Tests\Fixture\Procedure\Subtractor;
+use UMA\RPC\Tests\Fixture\Psr11\ArrayContainer;
 
 class ServerTest extends TestCase
 {
@@ -17,19 +17,39 @@ class ServerTest extends TestCase
     {
         $this->expectException(\LogicException::class);
 
-        $sut = new Server(new Psr11Decorator(new Container));
-        $sut->add('sum', Adder::class);
+        $sut = new Server(new ArrayContainer);
+        $sut->add('subtract', Subtractor::class);
     }
 
-    public function testInvalidProcedure()
+    public function testInvalidProcedureService()
     {
-        $container = new Container;
+        $container = new ArrayContainer([
+            Subtractor::class => 'this is not a Procedure!'
+        ]);
 
-        $container[Subtractor::class] = function () {
-            return null;
-        };
+        $sut = new Server($container);
+        $sut->add('subtract', Subtractor::class);
 
-        $sut = new Server(new Psr11Decorator($container));
+        self::assertSame(
+            '{"jsonrpc":"2.0","error":{"code":-32603,"message":"Internal error"},"id":1}',
+            $sut->run('{"jsonrpc": "2.0", "method": "subtract", "params": [42, 23], "id": 1}')
+        );
+    }
+
+    public function testPsr11ContainerException()
+    {
+        /** @var MockObject|ArrayContainer $container */
+        $container = $this->getMockBuilder(ArrayContainer::class)
+            ->setConstructorArgs([[Subtractor::class => new Subtractor]])
+            ->setMethods(['get'])
+            ->getMock();
+
+        $container->expects(self::once())
+            ->method('get')
+            ->with(Subtractor::class)
+            ->will(self::throwException(new class extends \RuntimeException implements ContainerExceptionInterface {}));
+
+        $sut = new Server($container);
         $sut->add('subtract', Subtractor::class);
 
         self::assertSame(
@@ -40,18 +60,16 @@ class ServerTest extends TestCase
 
     public function testInvalidParams()
     {
-        $container = new Container;
+        $container = new ArrayContainer([
+            Subtractor::class => new Subtractor
+        ]);
 
-        $container[Subtractor::class] = function () {
-            return new Subtractor;
-        };
-
-        $sut = new Server(new Psr11Decorator($container));
+        $sut = new Server($container);
         $sut->add('subtract', Subtractor::class);
 
         self::assertSame(
             '{"jsonrpc":"2.0","error":{"code":-32602,"message":"Invalid params"},"id":1}',
-            $sut->run('{"jsonrpc": "2.0", "method": "subtract", "params": [42, 23, 12], "id": 1}')
+            $sut->run('{"jsonrpc": "2.0", "method": "subtract", "params": ["foo", "bar"], "id": 1}')
         );
     }
 }

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace UMA\RPC\Tests\Fixture;
+namespace UMA\RPC\Tests\Fixture\Procedure;
 
 use UMA\RPC\Internal\Request;
 use UMA\RPC\Internal\Response;
