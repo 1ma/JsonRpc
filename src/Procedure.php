@@ -9,7 +9,14 @@ namespace UMA\JsonRpc;
  */
 interface Procedure
 {
+    /**
+     * Execute the given request.
+     */
     public function execute(Request $request): Response;
 
+    /**
+     * Returns an optional JSON schema object that will
+     * be validated against the incoming request parameters.
+     */
     public function getSpec(): ?\stdClass;
 }
