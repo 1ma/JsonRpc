@@ -7,7 +7,7 @@
          colors="true"
 >
     <testsuites>
-        <testsuite name="uma/rpc test suite">
+        <testsuite name="uma/json-rpc test suite">
             <directory>tests</directory>
         </testsuite>
     </testsuites>

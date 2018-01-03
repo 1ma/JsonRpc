@@ -1,5 +1,7 @@
 # JsonRpc
 
+[![Build Status](https://travis-ci.org/1ma/JsonRpc.svg?branch=master)](https://travis-ci.org/1ma/JsonRpc) [![Code Coverage](https://scrutinizer-ci.com/g/1ma/JsonRpc/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/1ma/JsonRpc/?branch=master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/1ma/JsonRpc/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/1ma/JsonRpc/?branch=master)
+
 A [JSON-RPC 2.0] implementation for PHP 7.1
 
 ## Installation
