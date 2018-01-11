@@ -6,6 +6,7 @@ php:
 
 before_script:
   - phpenv config-rm xdebug.ini
+  - composer install
 
 script:
   - composer test
