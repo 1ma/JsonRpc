@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace UMA\JsonRpc\Tests\Fixture\Procedure;
+namespace UMA\JsonRpc\Tests\Fixture;
 
 use UMA\JsonRpc\Request;
 use UMA\JsonRpc\Response;

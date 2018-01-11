@@ -4,55 +4,36 @@ declare(strict_types=1);
 
 namespace UMA\JsonRpc\Tests\Functional;
 
+use League\Container\ReflectionContainer;
 use PHPUnit\Framework\TestCase;
-use Pimple\Container;
-use Pimple\Psr11\Container as Psr11Decorator;
-use UMA\JsonRpc\Procedure;
 use UMA\JsonRpc\Server;
-use UMA\JsonRpc\Tests\Fixture\Procedure\Adder;
-use UMA\JsonRpc\Tests\Fixture\Procedure\Subtractor;
-use UMA\JsonRpc\Tests\Fixture\Procedure\MockProcedure;
+use UMA\JsonRpc\Tests\Fixture\Adder;
+use UMA\JsonRpc\Tests\Fixture\Subtractor;
+use UMA\JsonRpc\Tests\Fixture\MockProcedure;
 
 class EndToEndTest extends TestCase
 {
     /**
-     * @var Server
+     * @dataProvider specExamplesProvider
      */
-    private $sut;
-
-    protected function setUp()
+    public function testFullOrchestra(string $input, ?string $expected)
     {
-        $container = new Container();
-
-        $container[Adder::class] = function(): Procedure {
-            return new Adder();
-        };
-
-        $container[Subtractor::class] = function(): Procedure {
-            return new Subtractor();
-        };
-
-        $container[MockProcedure::class] = function(): Procedure {
-            return new MockProcedure();
-        };
-
-        $this->sut = new Server(new Psr11Decorator($container));
-        $this->sut
+        $sut = (new Server(new ReflectionContainer))
             ->add('get_data', MockProcedure::class)
             ->add('notify_hello', MockProcedure::class)
             ->add('sum', Adder::class)
             ->add('subtract', Subtractor::class)
             ->add('update', MockProcedure::class);
+
+        self::assertSame($expected, $sut->run($input));
     }
 
     /**
-     * @dataProvider specExamplesProvider
+     * This provider lists all the practical examples found
+     * on the official JSON-RPC 2.0 spec document.
+     *
+     * @see http://www.jsonrpc.org/specification#examples
      */
-    public function testServer(string $input, ?string $expected)
-    {
-        self::assertSame($expected, $this->sut->run($input));
-    }
-
     public function specExamplesProvider(): array
     {
         return [
