@@ -19,7 +19,7 @@ class Input
     private $data;
 
     /**
-     * @var bool
+     * @var int
      */
     private $error;
 
@@ -31,14 +31,14 @@ class Input
 
     public static function fromString(string $raw): Input
     {
-        return new static(\json_decode($raw), \json_last_error());
+        return new self(\json_decode($raw), \json_last_error());
     }
 
     public static function fromSafeData($data): Input
     {
         \assert(false !== \json_encode($data));
 
-        return new static($data, JSON_ERROR_NONE);
+        return new self($data, JSON_ERROR_NONE);
     }
 
     public function decoded()
@@ -58,8 +58,8 @@ class Input
 
     public function isRpcRequest(): bool
     {
-        if (!static::$reqSchema instanceof \stdClass) {
-            static::$reqSchema = \json_decode(file_get_contents(static::SCHEMA_PATH));
+        if (!self::$reqSchema instanceof \stdClass) {
+            self::$reqSchema = \json_decode(file_get_contents(self::SCHEMA_PATH));
         }
 
         return (new Guard(self::$reqSchema))($this->data);

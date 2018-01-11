@@ -18,7 +18,7 @@ class Server
     private $container;
 
     /**
-     * @var string
+     * @var string[]
      */
     private $methods;
 
