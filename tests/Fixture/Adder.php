@@ -13,16 +13,16 @@ class Adder implements Procedure
 {
     public function execute(Request $request): Response
     {
-        $accumulator = 0;
-
         /** @var int[] $numbers */
         $numbers = $request->params();
 
-        foreach ($numbers as $integer) {
-            $accumulator += $integer;
-        }
+        // $numbers is *guaranteed* to be an array of integers
+        // due to the Json schema defined in method getSpec()
+        $sum = \array_reduce($numbers, function(int $partialSum, int $number): int {
+            return $partialSum + $number;
+        }, 0);
 
-        return new Success($request->id(), $accumulator);
+        return new Success($request->id(), $sum);
     }
 
     public function getSpec(): ?\stdClass
