@@ -29,7 +29,7 @@ class Adder implements Procedure
     {
         return \json_decode(<<<'JSON'
 {
-  "$schema": "http://json-schema.org/schema#",
+  "$schema": "https://json-schema.org/draft-07/schema#",
 
   "type": "array",
   "minItems": 1,

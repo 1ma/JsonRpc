@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace UMA\JsonRpc\Internal;
 
-use League\JsonGuard\Validator;
+use Opis\JsonSchema\Validator;
 
 class Guard
 {
@@ -22,6 +22,8 @@ class Guard
     {
         \assert(false !== \json_encode($data));
 
-        return (new Validator($data, $this->schema))->passes();
+        return (new Validator())
+            ->dataValidation($data, $this->schema)
+            ->isValid();
     }
 }

@@ -5,7 +5,7 @@
     "type": "library",
     "require": {
         "php": ">=7.1",
-        "league/json-guard": "^1.0",
+        "opis/json-schema": "^1.0",
         "psr/container": "^1.0"
     },
     "require-dev": {
