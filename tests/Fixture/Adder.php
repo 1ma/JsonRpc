@@ -4,25 +4,23 @@ declare(strict_types=1);
 
 namespace UMA\JsonRpc\Tests\Fixture;
 
-use UMA\JsonRpc\Request;
-use UMA\JsonRpc\Response;
-use UMA\JsonRpc\Procedure;
-use UMA\JsonRpc\Success;
+use UMA\JsonRpc;
 
-class Adder implements Procedure
+class Adder implements JsonRpc\Procedure
 {
-    public function execute(Request $request): Response
+    public function execute(JsonRpc\Request $request): JsonRpc\Response
     {
-        /** @var int[] $numbers */
-        $numbers = $request->params();
+        // $request->params() is *guaranteed* to be an array of
+        // integers due to the JsonSchema defined in getSpec()
+        $sum = \array_reduce(
+            $request->params(),
+            function(int $partialSum, int $number): int {
+                return $partialSum + $number;
+            },
+            0
+        );
 
-        // $numbers is *guaranteed* to be an array of integers
-        // due to the Json schema defined in method getSpec()
-        $sum = \array_reduce($numbers, function(int $partialSum, int $number): int {
-            return $partialSum + $number;
-        }, 0);
-
-        return new Success($request->id(), $sum);
+        return new JsonRpc\Success($request->id(), $sum);
     }
 
     public function getSpec(): ?\stdClass
@@ -32,7 +30,6 @@ class Adder implements Procedure
   "$schema": "https://json-schema.org/draft-07/schema#",
 
   "type": "array",
-  "minItems": 1,
   "items": { "type": "integer" }
 }
 JSON

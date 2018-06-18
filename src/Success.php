@@ -12,8 +12,8 @@ class Success extends Response
     private $result;
 
     /**
-     * @param int|string $id
-     * @param mixed|null $result
+     * @param int|string|null $id
+     * @param mixed|null      $result
      */
     public function __construct($id, $result = null)
     {

@@ -4,20 +4,17 @@ declare(strict_types=1);
 
 namespace UMA\JsonRpc\Tests\Fixture;
 
-use UMA\JsonRpc\Request;
-use UMA\JsonRpc\Response;
-use UMA\JsonRpc\Procedure;
-use UMA\JsonRpc\Success;
+use UMA\JsonRpc;
 
-class MockProcedure implements Procedure
+class MockProcedure implements JsonRpc\Procedure
 {
-    public function execute(Request $request): Response
+    public function execute(JsonRpc\Request $request): JsonRpc\Response
     {
         if ('get_data' === $request->method()) {
-            return new Success($request->id(), ['hello', 5]);
+            return new JsonRpc\Success($request->id(), ['hello', 5]);
         }
 
-        return new Success($request->id());
+        return new JsonRpc\Success($request->id());
     }
 
     public function getSpec(): ?\stdClass

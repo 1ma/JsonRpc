@@ -9,9 +9,9 @@ class Input
     private const SCHEMA_PATH = __DIR__ . '/../../spec/request.json';
 
     /**
-     * @var \stdClass
+     * @var Guard
      */
-    private static $reqSchema;
+    private static $guard;
 
     /**
      * @var mixed
@@ -58,10 +58,12 @@ class Input
 
     public function isRpcRequest(): bool
     {
-        if (!self::$reqSchema instanceof \stdClass) {
-            self::$reqSchema = \json_decode(file_get_contents(self::SCHEMA_PATH));
+        if (!self::$guard instanceof Guard) {
+            self::$guard = new Guard(
+                \json_decode(\file_get_contents(self::SCHEMA_PATH))
+            );
         }
 
-        return (new Guard(self::$reqSchema))($this->data);
+        return (self::$guard)($this->data);
     }
 }

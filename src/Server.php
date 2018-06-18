@@ -62,7 +62,7 @@ class Server
         foreach ($input->decoded() as $request) {
             $pseudoInput = Input::fromSafeData($request);
 
-            if(null !== $response = $this->single($pseudoInput)) {
+            if (null !== $response = $this->single($pseudoInput)) {
                 $responses[] = $response;
             }
         }
@@ -74,35 +74,35 @@ class Server
     private function single(Input $input): ?string
     {
         if (!$input->isRpcRequest()) {
-            return $this->end(Error::invalidRequest());
+            return self::end(Error::invalidRequest());
         }
 
         $request = new Request($input);
 
         if (!array_key_exists($request->method(), $this->methods)) {
-            return $this->end(Error::unknownMethod($request->id()), $request);
+            return self::end(Error::unknownMethod($request->id()), $request);
         }
 
         try {
             $procedure = $this->container->get($this->methods[$request->method()]);
-        } catch (ContainerExceptionInterface|NotFoundExceptionInterface $e) {
-            return $this->end(Error::internal($request->id()), $request);
+        } catch (ContainerExceptionInterface | NotFoundExceptionInterface $e) {
+            return self::end(Error::internal($request->id()), $request);
         }
 
         if (!$procedure instanceof Procedure) {
-            return $this->end(Error::internal($request->id()), $request);
+            return self::end(Error::internal($request->id()), $request);
         }
 
         $spec = $procedure->getSpec();
 
         if ($spec instanceof \stdClass && !(new Guard($spec))($request->params())) {
-            return $this->end(Error::invalidParams($request->id()), $request);
+            return self::end(Error::invalidParams($request->id()), $request);
         }
 
-        return $this->end($procedure->execute($request), $request);
+        return self::end($procedure->execute($request), $request);
     }
 
-    private function end(Response $response, Request $request = null): ?string
+    private static function end(Response $response, Request $request = null): ?string
     {
         return $request instanceof Request && null === $request->id() ?
             null : \json_encode($response);
