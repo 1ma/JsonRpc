@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace UMA\JsonRpc\Tests\Unit;
 
-use League\Container\Container;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerExceptionInterface;
+use UMA\DIC\Container;
 use UMA\JsonRpc\Server;
 use UMA\JsonRpc\Tests\Fixture\Subtractor;
 
@@ -38,7 +38,7 @@ class ServerTest extends TestCase
 
     public function testInvalidProcedureService()
     {
-        $this->container->add(Subtractor::class, 'this is not a Procedure!');
+        $this->container->set(Subtractor::class, 'this is not a Procedure!');
 
         $this->sut->add('subtract', Subtractor::class);
 
@@ -50,7 +50,7 @@ class ServerTest extends TestCase
 
     public function testInvalidParams()
     {
-        $this->container->add(Subtractor::class, new Subtractor);
+        $this->container->set(Subtractor::class, new Subtractor);
 
         $this->sut->add('subtract', Subtractor::class);
 
@@ -72,7 +72,7 @@ class ServerTest extends TestCase
             ->with(Subtractor::class)
             ->will(self::throwException(new class extends \RuntimeException implements ContainerExceptionInterface {}));
 
-        $container->add(Subtractor::class, new Subtractor);
+        $container->set(Subtractor::class, new Subtractor);
 
         $sut = new Server($container);
         $sut->add('subtract', Subtractor::class);

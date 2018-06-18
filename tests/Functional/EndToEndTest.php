@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace UMA\JsonRpc\Tests\Functional;
 
-use League\Container\ReflectionContainer;
 use PHPUnit\Framework\TestCase;
+use UMA\DIC\Container;
 use UMA\JsonRpc\Server;
 use UMA\JsonRpc\Tests\Fixture\Adder;
 use UMA\JsonRpc\Tests\Fixture\Subtractor;
@@ -18,7 +18,13 @@ class EndToEndTest extends TestCase
      */
     public function testFullOrchestra(string $input, ?string $expected)
     {
-        $sut = (new Server(new ReflectionContainer))
+        $container = new Container([
+            Adder::class => new Adder(),
+            Subtractor::class => new Subtractor(),
+            MockProcedure::class => new MockProcedure()
+        ]);
+
+        $sut = (new Server($container))
             ->add('get_data', MockProcedure::class)
             ->add('notify_hello', MockProcedure::class)
             ->add('sum', Adder::class)

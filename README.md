@@ -15,7 +15,7 @@ $ composer require uma/json-rpc
 ### Features
 
 * Service lazy-loading
-* Built-in parameter validation with `league/json-guard`
+* Built-in parameter validation with `opis/json-schema`
 * Fully implemented spec
 
 ### JSON-RPC 2.0 versus HTTP REST
