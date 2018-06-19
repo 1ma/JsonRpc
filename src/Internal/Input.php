@@ -6,12 +6,39 @@ namespace UMA\JsonRpc\Internal;
 
 class Input
 {
-    private const SCHEMA_PATH = __DIR__ . '/../../spec/request.json';
+    /**
+     * This is the minimal schema that all JSON-RPC requests must conform to.
+     */
+    private const INPUT_SCHEMA = <<<'JSON'
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "description": "JSON-RPC 2.0 single request schema",
+
+  "type": "object",
+  "required": ["jsonrpc", "method"],
+  "additionalProperties": false,
+  "properties": {
+    "jsonrpc": {
+      "type": "string",
+      "enum": ["2.0"]
+    },
+    "method": {
+      "type": "string"
+    },
+    "params": {
+      "type": ["array", "object"]
+    },
+    "id": {
+      "type": ["integer", "string"]
+    }
+  }
+}
+JSON;
 
     /**
-     * @var Guard
+     * @var \stdClass
      */
-    private static $guard;
+    private static $schema;
 
     /**
      * @var mixed
@@ -58,12 +85,10 @@ class Input
 
     public function isRpcRequest(): bool
     {
-        if (!self::$guard instanceof Guard) {
-            self::$guard = new Guard(
-                \json_decode(\file_get_contents(self::SCHEMA_PATH))
-            );
+        if (!self::$schema instanceof \stdClass) {
+            self::$schema = \json_decode(self::INPUT_SCHEMA);
         }
 
-        return (self::$guard)($this->data);
+        return Validator::validate(self::$schema, $this->data);
     }
 }

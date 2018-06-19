@@ -7,7 +7,7 @@ namespace UMA\JsonRpc;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use UMA\JsonRpc\Internal\Guard;
+use UMA\JsonRpc\Internal\Validator;
 use UMA\JsonRpc\Internal\Input;
 
 class Server
@@ -44,7 +44,7 @@ class Server
         $input = Input::fromString($raw);
 
         if (!$input->parsable()) {
-            return $this->end(Error::parsing());
+            return self::end(Error::parsing());
         }
 
         if ($input->isArray()) {
@@ -56,7 +56,7 @@ class Server
 
     private function batch(Input $input): ?string
     {
-        \assert(\is_array($input->decoded()));
+        \assert($input->isArray());
 
         $responses = [];
         foreach ($input->decoded() as $request) {
@@ -95,7 +95,7 @@ class Server
 
         $spec = $procedure->getSpec();
 
-        if ($spec instanceof \stdClass && !(new Guard($spec))($request->params())) {
+        if ($spec instanceof \stdClass && !Validator::validate($spec, $request->params())) {
             return self::end(Error::invalidParams($request->id()), $request);
         }
 
