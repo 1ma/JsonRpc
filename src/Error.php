@@ -6,91 +6,75 @@ namespace UMA\JsonRpc;
 
 class Error extends Response
 {
-    private const ERROR_TABLE = [
-        -32000 => 'Server error',
-        -32600 => 'Invalid Request',
-        -32601 => 'Method not found',
-        -32602 => 'Invalid params',
-        -32603 => 'Internal error',
-        -32700 => 'Parse error'
-    ];
-
     /**
      * @var int
      */
     private $code;
 
     /**
-     * @var mixed|null
+     * @var string
+     */
+    private $message;
+
+    /**
+     * @var mixed
      */
     private $data;
 
     /**
      * @param int             $code
+     * @param string          $message
+     * @param mixed           $data
      * @param int|string|null $id
-     * @param mixed|null      $data
      */
-    private function __construct(int $code, $id = null, $data = null)
+    public function __construct(int $code, string $message, $data = null, $id = null)
     {
-        $this->id = $id;
         $this->code = $code;
+        $this->message = $message;
         $this->data = $data;
+        $this->id = $id;
     }
 
     public static function parsing(): Error
     {
-        return new static(-32700);
+        return new static(-32700, 'Parse error');
     }
 
     public static function invalidRequest(): Error
     {
-        return new static(-32600);
+        return new static(-32600, 'Invalid Request');
     }
 
-    /**
-     * @param int|string $id
-     */
     public static function unknownMethod($id): Error
     {
-        return new static(-32601, $id);
+        return new static(-32601, 'Method not found', null, $id);
     }
 
-    /**
-     * @param int|string $id
-     */
     public static function invalidParams($id): Error
     {
-        return new static(-32602, $id);
+        return new static(-32602, 'Invalid params', null, $id);
     }
 
-    public static function custom($id, $data): Error
-    {
-        return new static(-32000, $id, $data);
-    }
-
-    /**
-     * @param int|string $id
-     */
     public static function internal($id): Error
     {
-        return new static(-32603, $id);
+        return new static(-32603, 'Internal error', null, $id);
     }
 
     public function jsonSerialize(): array
     {
-        $response = [
+        $payload = [
             'jsonrpc' => '2.0',
             'error' => [
                 'code' => $this->code,
-                'message' => static::ERROR_TABLE[$this->code]
+                'message' => $this->message
             ],
             'id' => $this->id
         ];
 
         if (null !== $this->data) {
-            $response['error']['data'] = $this->data;
+            $payload['error']['data'] = $this->data;
         }
 
-        return $response;
+        return $payload;
     }
 }

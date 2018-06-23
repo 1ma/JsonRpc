@@ -9,7 +9,7 @@ use UMA\JsonRpc\Error;
 
 class ErrorTest extends TestCase
 {
-    public function testErrorResponses()
+    public function testErrorResponses(): void
     {
         self::assertSame(
             '{"jsonrpc":"2.0","error":{"code":-32700,"message":"Parse error"},"id":null}',
@@ -37,8 +37,13 @@ class ErrorTest extends TestCase
         );
 
         self::assertSame(
-            '{"jsonrpc":"2.0","error":{"code":-32000,"message":"Server error","data":"Division by zero"},"id":1}',
-            \json_encode(Error::custom(1, 'Division by zero'))
+            '{"jsonrpc":"2.0","error":{"code":-123,"message":"Division by zero"},"id":null}',
+            \json_encode(new Error(-123, 'Division by zero'))
+        );
+
+        self::assertSame(
+            '{"jsonrpc":"2.0","error":{"code":-456,"message":"Unknown user","data":{"email":"john.doe@example.com"}},"id":999}',
+            \json_encode(new Error(-456, 'Unknown user', ['email' => 'john.doe@example.com'], 999))
         );
 
         self::assertSame(

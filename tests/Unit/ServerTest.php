@@ -29,14 +29,14 @@ class ServerTest extends TestCase
         $this->sut = new Server($this->container);
     }
 
-    public function testAddingANonExistentService()
+    public function testAddingANonExistentService(): void
     {
         $this->expectException(\LogicException::class);
 
         $this->sut->add('subtract', Subtractor::class);
     }
 
-    public function testInvalidProcedureService()
+    public function testInvalidProcedureService(): void
     {
         $this->container->set(Subtractor::class, 'this is not a Procedure!');
 
@@ -48,7 +48,7 @@ class ServerTest extends TestCase
         );
     }
 
-    public function testInvalidParams()
+    public function testInvalidParams(): void
     {
         $this->container->set(Subtractor::class, new Subtractor);
 
@@ -60,7 +60,7 @@ class ServerTest extends TestCase
         );
     }
 
-    public function testPsr11ContainerException()
+    public function testPsr11ContainerException(): void
     {
         /** @var MockObject|Container $container */
         $container = $this->getMockBuilder(Container::class)

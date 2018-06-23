@@ -7,7 +7,8 @@ namespace UMA\JsonRpc\Internal;
 class Input
 {
     /**
-     * This is the minimal schema that all JSON-RPC requests must conform to.
+     * This is the minimal schema that all incoming payloads must
+     * conform to in order to be considered actual JSON-RPC requests.
      */
     private const INPUT_SCHEMA = <<<'JSON'
 {

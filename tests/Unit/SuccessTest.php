@@ -9,7 +9,7 @@ use UMA\JsonRpc\Success;
 
 class SuccessTest extends TestCase
 {
-    public function testSuccessfulResponsesSerialization()
+    public function testSuccessfulResponsesSerialization(): void
     {
         self::assertSame(
             '{"jsonrpc":"2.0","result":19,"id":"1"}',

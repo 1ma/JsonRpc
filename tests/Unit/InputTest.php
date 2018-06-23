@@ -12,7 +12,7 @@ class InputTest extends TestCase
     /**
      * @dataProvider validInputsProvider
      */
-    public function testValidInputs(string $raw)
+    public function testValidInputs(string $raw): void
     {
         $sut = Input::fromString($raw);
 
@@ -34,7 +34,7 @@ class InputTest extends TestCase
     /**
      * @dataProvider parseErrorProvider
      */
-    public function testInputParseError(string $raw)
+    public function testInputParseError(string $raw): void
     {
         $sut = Input::fromString($raw);
 
@@ -56,7 +56,7 @@ class InputTest extends TestCase
     /**
      * @dataProvider invalidInputsProvider
      */
-    public function testInvalidInputs(string $raw)
+    public function testInvalidInputs(string $raw): void
     {
         $sut = Input::fromString($raw);
 

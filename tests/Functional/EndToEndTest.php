@@ -16,7 +16,7 @@ class EndToEndTest extends TestCase
     /**
      * @dataProvider specExamplesProvider
      */
-    public function testFullOrchestra(string $input, ?string $expected)
+    public function testFullOrchestra(string $input, ?string $expected): void
     {
         $container = new Container([
             Adder::class => new Adder(),

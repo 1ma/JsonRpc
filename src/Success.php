@@ -13,7 +13,7 @@ class Success extends Response
 
     /**
      * @param int|string|null $id
-     * @param mixed|null      $result
+     * @param mixed           $result
      */
     public function __construct($id, $result = null)
     {
