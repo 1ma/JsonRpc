@@ -60,6 +60,22 @@ class ServerTest extends TestCase
         );
     }
 
+    public function testTooManyBatchRequestsSent(): void
+    {
+        $this->container->set(Subtractor::class, new Subtractor);
+
+        $limitedServer = new Server($this->container, 1);
+        $limitedServer->add('subtract', Subtractor::class);
+
+        self::assertSame(
+            '{"jsonrpc":"2.0","error":{"code":-32000,"message":"Too many batch requests sent to server","data":{"limit":1}},"id":null}',
+            $limitedServer->run('[
+              {"jsonrpc": "2.0", "method": "subtract", "params": [42, 23], "id": 1},
+              {"jsonrpc": "2.0", "method": "subtract", "params": [42, 23], "id": 1}
+            ]')
+        );
+    }
+
     public function testPsr11ContainerException(): void
     {
         /** @var MockObject|Container $container */

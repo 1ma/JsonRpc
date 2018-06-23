@@ -60,6 +60,11 @@ class Error extends Response
         return new static(-32603, 'Internal error', null, $id);
     }
 
+    public static function tooManyBatchRequests(int $limit): Error
+    {
+        return new static(-32000, 'Too many batch requests sent to server', ['limit' => $limit]);
+    }
+
     public function jsonSerialize(): array
     {
         $payload = [

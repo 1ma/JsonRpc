@@ -37,6 +37,11 @@ class ErrorTest extends TestCase
         );
 
         self::assertSame(
+            '{"jsonrpc":"2.0","error":{"code":-32000,"message":"Too many batch requests sent to server","data":{"limit":10}},"id":null}',
+            \json_encode(Error::tooManyBatchRequests(10))
+        );
+
+        self::assertSame(
             '{"jsonrpc":"2.0","error":{"code":-123,"message":"Division by zero"},"id":null}',
             \json_encode(new Error(-123, 'Division by zero'))
         );

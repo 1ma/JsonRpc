@@ -22,9 +22,15 @@ class Server
      */
     private $methods;
 
-    public function __construct(ContainerInterface $container)
+    /**
+     * @var int|null
+     */
+    private $batchLimit;
+
+    public function __construct(ContainerInterface $container, int $batchLimit = null)
     {
         $this->container = $container;
+        $this->batchLimit = $batchLimit;
         $this->methods = [];
     }
 
@@ -57,6 +63,10 @@ class Server
     private function batch(Input $input): ?string
     {
         \assert($input->isArray());
+
+        if ($this->tooManyBatchRequests($input)) {
+            return self::end(Error::tooManyBatchRequests($this->batchLimit));
+        }
 
         $responses = [];
         foreach ($input->decoded() as $request) {
@@ -100,6 +110,13 @@ class Server
         }
 
         return self::end($procedure->execute($request), $request);
+    }
+
+    private function tooManyBatchRequests(Input $input): bool
+    {
+        \assert($input->isArray());
+
+        return \is_int($this->batchLimit) && $this->batchLimit < \count($input->decoded());
     }
 
     private static function end(Response $response, Request $request = null): ?string
