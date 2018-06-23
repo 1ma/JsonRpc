@@ -18,6 +18,7 @@ A modern [JSON-RPC 2.0] server for PHP 7.1
 - [Best Practices](#best-practices)
 	- [Rely on JSON schemas to validate params](#rely-on-json-schemas-to-validate-params)
 	- [Defer actual work whenever possible](#defer-actual-work-whenever-possible)
+	- [Cap the number of batch requests](#cap-the-number-of-batch-requests)
 
 
 ## Installation
@@ -41,7 +42,7 @@ This example shows a possible implementation of the `subtract` procedure found i
 ```php
 declare(strict_types=1);
 
-namespace Demo\RPC;
+namespace Demo;
 
 use UMA\JsonRpc;
 
@@ -85,7 +86,7 @@ class Subtractor implements JsonRpc\Procedure
   }
 }
 JSON
-);
+        );
     }
 }
 ```
@@ -93,14 +94,9 @@ JSON
 The logic assumes that `$request->params()` is either an array of two integers,
 or an `\stdClass` with a `minuend` and `subtrahend` attributes that are both integers.
 
-This is perfectly safe because the `Server` matches the JSON schema defined below against
+This is perfectly safe because the `Server` matches the JSON schema defined above against
 `$request->params()` before even calling `execute()`. Whenever the input does not conform
 to the spec, a `-32602 (Invalid params)` error is returned and the procedure does not run.
-
-```
---> {"jsonrpc":"2.0","method":"subtract","params":{"foo":"bar"},"id":123}
-<-- {"jsonrpc":"2.0","error":{"code":-32602,"message":"Invalid params"},"id":123}
-```
 
 ### Registering Services
 
@@ -110,7 +106,7 @@ the server. In this example I used `uma/dic`:
 ```php
 declare(strict_types=1);
 
-use Demo\RPC\Subtractor;
+use Demo\Subtractor;
 use UMA\JsonRpc\Server;
 
 $c = new \UMA\DIC\Container();
@@ -121,7 +117,7 @@ $c->set(Subtractor::class, function(): Subtractor {
 
 $c->set(Server::class, function(Container $c): Server {
     $server = new Server($c);
-    $server->add('subtract', Subtractor::class);
+    $server->set('subtract', Subtractor::class);
     
     return $server;
 });
@@ -146,30 +142,36 @@ use UMA\JsonRpc\Server;
 
 $server = $c->get(Server::class);
 
-var_dump($server->run('{"jsonrpc":"2.0","method":"subtract","params":[2,3],"id":1}'));
-// string(36) '{"jsonrpc":"2.0","result":-1,"id":1}'
+// RPC call with positional parameters
+$response = $server->run('{"jsonrpc":"2.0","method":"subtract","params":[2,3],"id":1}');
+// $response is '{"jsonrpc":"2.0","result":-1,"id":1}'
 
-var_dump($server->run('{"jsonrpc":"2.0","method":"subtract","params":{"minuend":2,"subtrahend":3},"id":1}'));
-// string(36) '{"jsonrpc":"2.0","result":-1,"id":1}'
+// RPC call with named parameters
+$response = $server->run('{"jsonrpc":"2.0","method":"subtract","params":{"minuend":2,"subtrahend":3},"id":1}');
+// $response is '{"jsonrpc":"2.0","result":-1,"id":1}'
 
-var_dump($server->run('{"jsonrpc":"2.0","method":"subtract","params":[2,3]}')); // Notifications return null
-// NULL
+// Notification (request with no id)
+$response = $server->run('{"jsonrpc":"2.0","method":"subtract","params":[2,3]}');
+// $response is NULL
 
-var_dump($server->run('{"jsonrpc":"2.0","method":"subtract","params":{"foo":"bar"},"id":1}'));
-// string(75) '{"jsonrpc":"2.0","error":{"code":-32602,"message":"Invalid params"},"id":1}'
+// RPC call with invalid params
+$response = $server->run('{"jsonrpc":"2.0","method":"subtract","params":{"foo":"bar"},"id":1}');
+// $response is '{"jsonrpc":"2.0","error":{"code":-32602,"message":"Invalid params"},"id":1}'
 
-var_dump($server->run('invalid input {?<derp'));
-// string(75) '{"jsonrpc":"2.0","error":{"code":-32700,"message":"Parse error"},"id":null}'
+// RPC call with invalid JSON
+$response = $server->run('invalid input {?<derp');
+// $response is '{"jsonrpc":"2.0","error":{"code":-32700,"message":"Parse error"},"id":null}'
 
-var_dump($server->run('{"jsonrpc":"2.0","method":"add","params":[2,3],"id":1}'));
-// string(77) '{"jsonrpc":"2.0","error":{"code":-32601,"message":"Method not found"},"id":1}'
+// RPC call on non-existent method
+$response = $server->run('{"jsonrpc":"2.0","method":"add","params":[2,3],"id":1}');
+// $response is '{"jsonrpc":"2.0","error":{"code":-32601,"message":"Method not found"},"id":1}'
 ```
 
 ## FAQ
 
 ### Does JSON-RPC 2.0 have any advantage over REST?
 
-Yes, some. The most significant is that the spec is built on top of JSON and nothing else (i.e. there
+Yes, some! The most significant is that the spec is built on top of JSON and nothing else (i.e. there
 is no talk of HTTP verbs, headers or authentication schemes in it). As a result, JSON-RPC 2.0
 is completely decoupled from the transport layer, it can run over HTTP, WebSockets, a console REPL or even
 over [avian carriers] or sheets of paper. This is actually the reason why the interface of `Server::run()` works
@@ -205,6 +207,27 @@ JSON-RPC server could then consume the queue and do the actual work.
 
 The protocol actually supports this use case: whenever an incoming request does not have an `id`,
 the server must not send the response back (these kind of requests are called `Notifications` in the spec).
+
+### Cap the number of batch requests
+
+Batch requests are a denial of service vector, even if PHP was capable of processing these concurrently.
+A malicious client can potentially send hundreds or thousands of heavy requests, effectively clogging the resources of the server.
+
+To minimize that risk, `Server` has an optional `batchLimit` parameter that specifies the maximum number of
+batch requests that the server can handle. Setting it to 1 effectively disables batch processing, if you don't
+need that feature.
+
+```php
+$server = new \UMA\JsonRpc\Server($container, 2);
+$server->set('add', Adder::class);
+
+$response = $server->run('[
+  {"jsonrpc": "2.0", "method": "add", "params": [], "id": 1},
+  {"jsonrpc": "2.0", "method": "add", "params": [1,2], "id": 2},
+  {"jsonrpc": "2.0", "method": "add", "params": [1,2,3,4], "id": 3}
+]');
+// $response is '{"jsonrpc":"2.0","error":{"code":-32000,"message":"Too many batch requests sent to server","data":{"limit":2}},"id":null}'
+```
 
 
 [JSON-RPC 2.0]: http://www.jsonrpc.org/specification
