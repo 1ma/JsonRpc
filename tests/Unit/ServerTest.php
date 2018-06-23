@@ -33,14 +33,14 @@ class ServerTest extends TestCase
     {
         $this->expectException(\LogicException::class);
 
-        $this->sut->add('subtract', Subtractor::class);
+        $this->sut->set('subtract', Subtractor::class);
     }
 
     public function testInvalidProcedureService(): void
     {
         $this->container->set(Subtractor::class, 'this is not a Procedure!');
 
-        $this->sut->add('subtract', Subtractor::class);
+        $this->sut->set('subtract', Subtractor::class);
 
         self::assertSame(
             '{"jsonrpc":"2.0","error":{"code":-32603,"message":"Internal error"},"id":1}',
@@ -52,7 +52,7 @@ class ServerTest extends TestCase
     {
         $this->container->set(Subtractor::class, new Subtractor);
 
-        $this->sut->add('subtract', Subtractor::class);
+        $this->sut->set('subtract', Subtractor::class);
 
         self::assertSame(
             '{"jsonrpc":"2.0","error":{"code":-32602,"message":"Invalid params"},"id":1}',
@@ -65,13 +65,13 @@ class ServerTest extends TestCase
         $this->container->set(Subtractor::class, new Subtractor);
 
         $limitedServer = new Server($this->container, 1);
-        $limitedServer->add('subtract', Subtractor::class);
+        $limitedServer->set('subtract', Subtractor::class);
 
         self::assertSame(
             '{"jsonrpc":"2.0","error":{"code":-32000,"message":"Too many batch requests sent to server","data":{"limit":1}},"id":null}',
             $limitedServer->run('[
               {"jsonrpc": "2.0", "method": "subtract", "params": [42, 23], "id": 1},
-              {"jsonrpc": "2.0", "method": "subtract", "params": [42, 23], "id": 1}
+              {"jsonrpc": "2.0", "method": "subtract", "params": [42, 23], "id": 2}
             ]')
         );
     }
@@ -91,7 +91,7 @@ class ServerTest extends TestCase
         $container->set(Subtractor::class, new Subtractor);
 
         $sut = new Server($container);
-        $sut->add('subtract', Subtractor::class);
+        $sut->set('subtract', Subtractor::class);
 
         self::assertSame(
             '{"jsonrpc":"2.0","error":{"code":-32603,"message":"Internal error"},"id":1}',

@@ -25,11 +25,11 @@ class EndToEndTest extends TestCase
         ]);
 
         $sut = (new Server($container))
-            ->add('get_data', MockProcedure::class)
-            ->add('notify_hello', MockProcedure::class)
-            ->add('sum', Adder::class)
-            ->add('subtract', Subtractor::class)
-            ->add('update', MockProcedure::class);
+            ->set('get_data', MockProcedure::class)
+            ->set('notify_hello', MockProcedure::class)
+            ->set('sum', Adder::class)
+            ->set('subtract', Subtractor::class)
+            ->set('update', MockProcedure::class);
 
         self::assertSame($expected, $sut->run($input));
     }

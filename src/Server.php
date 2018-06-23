@@ -34,7 +34,7 @@ class Server
         $this->methods = [];
     }
 
-    public function add(string $method, string $serviceId): Server
+    public function set(string $method, string $serviceId): Server
     {
         if (!$this->container->has($serviceId)) {
             throw new \LogicException("Cannot find service '$serviceId' in the container");
