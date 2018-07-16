@@ -7,6 +7,7 @@ namespace UMA\JsonRpc;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use UMA\JsonRpc\Internal\Pipeliner;
 use UMA\JsonRpc\Internal\Validator;
 use UMA\JsonRpc\Internal\Input;
 
@@ -23,6 +24,11 @@ class Server
     private $methods;
 
     /**
+     * @var Middleware[]
+     */
+    private $middlewares;
+
+    /**
      * @var int|null
      */
     protected $batchLimit;
@@ -32,6 +38,7 @@ class Server
         $this->container = $container;
         $this->batchLimit = $batchLimit;
         $this->methods = [];
+        $this->middlewares = [];
     }
 
     public function set(string $method, string $serviceId): Server
@@ -41,6 +48,17 @@ class Server
         }
 
         $this->methods[$method] = $serviceId;
+
+        return $this;
+    }
+
+    public function pipe(string $serviceId): Server
+    {
+        if (!$this->container->has($serviceId)) {
+            throw new \LogicException("Cannot find service '$serviceId' in the container");
+        }
+
+        $this->middlewares[$serviceId] = null;
 
         return $this;
     }
@@ -109,7 +127,13 @@ class Server
             return self::end(Error::invalidParams($request->id()), $request);
         }
 
-        return self::end($procedure->execute($request), $request);
+        try {
+            $pipeline = Pipeliner::build($this->container, $procedure, $this->middlewares);
+        } catch (\RuntimeException $e) {
+            return self::end(Error::internal($request->id()), $request);
+        }
+
+        return self::end($pipeline($request), $request);
     }
 
     protected function tooManyBatchRequests(Input $input): bool

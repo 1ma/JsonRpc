@@ -9,6 +9,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerExceptionInterface;
 use UMA\DIC\Container;
 use UMA\JsonRpc\Server;
+use UMA\JsonRpc\Tests\Fixture\NotificationMiddleware;
 use UMA\JsonRpc\Tests\Fixture\Subtractor;
 
 class ServerTest extends TestCase
@@ -29,11 +30,18 @@ class ServerTest extends TestCase
         $this->sut = new Server($this->container);
     }
 
-    public function testAddingANonExistentService(): void
+    public function testAddingANonExistentProcedureService(): void
     {
         $this->expectException(\LogicException::class);
 
         $this->sut->set('subtract', Subtractor::class);
+    }
+
+    public function testAddingANonExistentMiddlewareService(): void
+    {
+        $this->expectException(\LogicException::class);
+
+        $this->sut->pipe(NotificationMiddleware::class);
     }
 
     public function testInvalidProcedureService(): void
@@ -41,6 +49,20 @@ class ServerTest extends TestCase
         $this->container->set(Subtractor::class, 'this is not a Procedure!');
 
         $this->sut->set('subtract', Subtractor::class);
+
+        self::assertSame(
+            '{"jsonrpc":"2.0","error":{"code":-32603,"message":"Internal error"},"id":1}',
+            $this->sut->run('{"jsonrpc": "2.0", "method": "subtract", "params": [42, 23], "id": 1}')
+        );
+    }
+
+    public function testInvalidMiddleware(): void
+    {
+        $this->container->set(Subtractor::class, new Subtractor);
+        $this->container->set(NotificationMiddleware::class, 'This is not a Middleware!');
+
+        $this->sut->set('subtract', Subtractor::class);
+        $this->sut->pipe(NotificationMiddleware::class);
 
         self::assertSame(
             '{"jsonrpc":"2.0","error":{"code":-32603,"message":"Internal error"},"id":1}',

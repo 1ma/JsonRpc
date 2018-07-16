@@ -12,7 +12,7 @@ interface Procedure
     /**
      * Execute the given request.
      */
-    public function execute(Request $request): Response;
+    public function __invoke(Request $request): Response;
 
     /**
      * Returns an optional JSON schema object that will
