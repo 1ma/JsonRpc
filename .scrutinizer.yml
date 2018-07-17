@@ -1,17 +1,27 @@
 filter:
     excluded_paths:
-        - 'tests/*'
+        - 'tests/'
+    dependency_paths:
+        - 'vendor/'
 checks:
     php: true
 coding_style:
     php: {  }
 build:
-    environment:
-        php: '7.1'
-    tests:
-        override:
-            -
-                command: composer test
-                coverage:
-                    file: build/coverage.xml
-                    format: php-clover
+    nodes:
+        analysis:
+            project_setup:
+                override: true
+            tests:
+                override:
+                    - php-scrutinizer-run --enable-security-analysis
+        testing:
+            environment:
+                php: '7.1'
+            tests:
+                override:
+                    -
+                        command: composer test
+                        coverage:
+                            file: build/coverage.xml
+                            format: php-clover
