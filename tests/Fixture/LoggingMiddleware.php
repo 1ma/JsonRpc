@@ -22,7 +22,7 @@ class LoggingMiddleware implements JsonRpc\Middleware
     {
         $this->requests[] = \json_encode($request);
 
-        $response =  $next($request);
+        $response = $next($request);
 
         $this->responses[] = \json_encode($response);
 

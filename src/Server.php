@@ -52,7 +52,7 @@ class Server
         return $this;
     }
 
-    public function pipe(string $serviceId): Server
+    public function attach(string $serviceId): Server
     {
         if (!$this->container->has($serviceId)) {
             throw new \LogicException("Cannot find service '$serviceId' in the container");

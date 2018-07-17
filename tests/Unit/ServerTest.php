@@ -41,7 +41,7 @@ class ServerTest extends TestCase
     {
         $this->expectException(\LogicException::class);
 
-        $this->sut->pipe(LoggingMiddleware::class);
+        $this->sut->attach(LoggingMiddleware::class);
     }
 
     public function testInvalidProcedureService(): void
@@ -62,7 +62,7 @@ class ServerTest extends TestCase
         $this->container->set(LoggingMiddleware::class, 'This is not a Middleware!');
 
         $this->sut->set('subtract', Subtractor::class);
-        $this->sut->pipe(LoggingMiddleware::class);
+        $this->sut->attach(LoggingMiddleware::class);
 
         self::assertSame(
             '{"jsonrpc":"2.0","error":{"code":-32603,"message":"Internal error"},"id":1}',

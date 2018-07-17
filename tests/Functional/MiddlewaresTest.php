@@ -33,7 +33,7 @@ class MiddlewaresTest extends TestCase
 
         $this->sut = (new Server($container))
             ->set('subtract', Subtractor::class)
-            ->pipe(LoggingMiddleware::class);
+            ->attach(LoggingMiddleware::class);
     }
 
     public function testMiddleware(): void
