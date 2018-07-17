@@ -129,7 +129,7 @@ class Server
 
         try {
             $pipeline = Pipeliner::build($this->container, $procedure, $this->middlewares);
-        } catch (\RuntimeException $e) {
+        } catch (\Throwable $t) {
             return self::end(Error::internal($request->id()), $request);
         }
 

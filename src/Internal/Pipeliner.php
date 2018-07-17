@@ -24,19 +24,13 @@ class Pipeliner
         $pipe = $procedure;
 
         foreach ($services as $service => $_) {
-            $middleware = $container->get($service);
-
-            if (!$middleware instanceof JsonRpc\Middleware) {
-                throw new \RuntimeException('Expected an instance of UMA\\JsonRpc\\Middleware');
-            }
-
-            $pipe = self::connect($middleware, $pipe);
+            $pipe = self::chain($container->get($service), $pipe);
         }
 
         return $pipe;
     }
 
-    private static function connect(JsonRpc\Middleware $outer, callable $inner): callable
+    private static function chain(JsonRpc\Middleware $outer, callable $inner): callable
     {
         return function (JsonRpc\Request $request) use ($outer, $inner): JsonRpc\Response {
             return $outer($request, $inner);
