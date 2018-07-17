@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerExceptionInterface;
 use UMA\DIC\Container;
 use UMA\JsonRpc\Server;
-use UMA\JsonRpc\Tests\Fixture\NotificationMiddleware;
+use UMA\JsonRpc\Tests\Fixture\LoggingMiddleware;
 use UMA\JsonRpc\Tests\Fixture\Subtractor;
 
 class ServerTest extends TestCase
@@ -41,7 +41,7 @@ class ServerTest extends TestCase
     {
         $this->expectException(\LogicException::class);
 
-        $this->sut->pipe(NotificationMiddleware::class);
+        $this->sut->pipe(LoggingMiddleware::class);
     }
 
     public function testInvalidProcedureService(): void
@@ -59,10 +59,10 @@ class ServerTest extends TestCase
     public function testInvalidMiddleware(): void
     {
         $this->container->set(Subtractor::class, new Subtractor);
-        $this->container->set(NotificationMiddleware::class, 'This is not a Middleware!');
+        $this->container->set(LoggingMiddleware::class, 'This is not a Middleware!');
 
         $this->sut->set('subtract', Subtractor::class);
-        $this->sut->pipe(NotificationMiddleware::class);
+        $this->sut->pipe(LoggingMiddleware::class);
 
         self::assertSame(
             '{"jsonrpc":"2.0","error":{"code":-32603,"message":"Internal error"},"id":1}',

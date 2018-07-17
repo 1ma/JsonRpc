@@ -7,7 +7,7 @@ namespace UMA\JsonRpc\Tests\Functional;
 use PHPUnit\Framework\TestCase;
 use UMA\DIC\Container;
 use UMA\JsonRpc\Server;
-use UMA\JsonRpc\Tests\Fixture\NotificationMiddleware;
+use UMA\JsonRpc\Tests\Fixture\LoggingMiddleware;
 use UMA\JsonRpc\Tests\Fixture\Subtractor;
 
 class MiddlewaresTest extends TestCase
@@ -18,34 +18,46 @@ class MiddlewaresTest extends TestCase
     private $sut;
 
     /**
-     * @var NotificationMiddleware
+     * @var LoggingMiddleware
      */
     private $middleware;
 
     protected function setUp()
     {
-        $this->middleware = new NotificationMiddleware();
+        $this->middleware = new LoggingMiddleware();
 
         $container = new Container([
             Subtractor::class => new Subtractor(),
-            NotificationMiddleware::class => $this->middleware
+            LoggingMiddleware::class => $this->middleware
         ]);
 
         $this->sut = (new Server($container))
             ->set('subtract', Subtractor::class)
-            ->pipe(NotificationMiddleware::class);
+            ->pipe(LoggingMiddleware::class);
     }
 
     public function testMiddleware(): void
     {
-        $response = $this->sut->run('{"jsonrpc": "2.0", "method": "subtract", "params": [42, 23], "id": 1}');
+        $this->sut->run('{"jsonrpc": "2.0", "method": "subtract", "params": [42, 23], "id": 1}');
 
-        self::assertFalse($this->middleware->lastRequestWasANotification());
-        self::assertNotNull($response);
+        self::assertSame([
+            '{"jsonrpc":"2.0","method":"subtract","params":[42,23],"id":1}'
+        ], $this->middleware->getSeenRequests());
 
-        $response = $this->sut->run('{"jsonrpc": "2.0", "method": "subtract", "params": [42, 23]}');
+        self::assertSame([
+            '{"jsonrpc":"2.0","result":19,"id":1}'
+        ], $this->middleware->getSeenResponses());
 
-        self::assertTrue($this->middleware->lastRequestWasANotification());
-        self::assertNull($response);
+        $this->sut->run('{"jsonrpc": "2.0", "method": "subtract", "params": [42, 23]}');
+
+        self::assertSame([
+            '{"jsonrpc":"2.0","method":"subtract","params":[42,23],"id":1}',
+            '{"jsonrpc":"2.0","method":"subtract","params":[42,23]}'
+        ], $this->middleware->getSeenRequests());
+
+        self::assertSame([
+            '{"jsonrpc":"2.0","result":19,"id":1}',
+            '{"jsonrpc":"2.0","result":19,"id":null}'
+        ], $this->middleware->getSeenResponses());
     }
 }

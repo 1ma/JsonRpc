@@ -87,7 +87,7 @@ class Server
         }
 
         $responses = [];
-        foreach ($input->decoded() as $request) {
+        foreach ($input->data() as $request) {
             $pseudoInput = Input::fromSafeData($request);
 
             if (null !== $response = $this->single($pseudoInput)) {
@@ -140,7 +140,7 @@ class Server
     {
         \assert($input->isArray());
 
-        return \is_int($this->batchLimit) && $this->batchLimit < \count($input->decoded());
+        return \is_int($this->batchLimit) && $this->batchLimit < \count($input->data());
     }
 
     protected static function end(Response $response, Request $request = null): ?string

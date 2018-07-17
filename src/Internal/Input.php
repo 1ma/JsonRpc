@@ -69,7 +69,7 @@ JSON;
         return new self($data, JSON_ERROR_NONE);
     }
 
-    public function decoded()
+    public function data()
     {
         return $this->data;
     }
