@@ -14,8 +14,8 @@ A modern [JSON-RPC 2.0] server for PHP 7.1
 	- [Running the Server](#running-the-server)
 - [Concurrent Server](#concurrent-server)
 - [FAQ](#faq)
-	- [Does JSON-RPC 2.0 have any advantage over REST?](#does-json-rpc-2.0-have-any-advantage-over-rest?)
-	- [How do you integrate `uma/json-rpc` with other frameworks?](#how-do-you-integrate-`uma/json-rpc`-with-other-frameworks?)
+	- [Does JSON-RPC 2.0 have any advantage over REST?](#does-json-rpc-20-have-any-advantage-over-rest)
+	- [How do you integrate `uma/json-rpc` with other frameworks?](#how-do-you-integrate-umajson-rpc-with-other-frameworks)
 - [Best Practices](#best-practices)
 	- [Rely on JSON schemas to validate params](#rely-on-json-schemas-to-validate-params)
 	- [Defer actual work whenever possible](#defer-actual-work-whenever-possible)
@@ -222,12 +222,15 @@ the server must not send the response back (these kind of requests are called `N
 
 ### Cap the number of batch requests
 
-Batch requests are a denial of service vector, even if PHP was capable of processing these concurrently.
-A malicious client can potentially send hundreds or thousands of heavy requests, effectively clogging the resources of the server.
+When a `Server` is exposed over HTTP, batch requests are a denial of service vector (even if PHP was capable of processing them concurrently).
+A malicious client can potentially send a batch request with thousands of sub-requests, effectively clogging the resources of the server.
 
 To minimize that risk, `Server` has an optional `batchLimit` parameter that specifies the maximum number of
 batch requests that the server can handle. Setting it to 1 effectively disables batch processing, if you don't
 need that feature.
+
+PS. An attacker could also send hundreds or thousands of single requests, clogging the server all the same. But given that
+these are all individual HTTP requests they can be rate-limited at the webserver level.
 
 ```php
 $server = new \UMA\JsonRpc\Server($container, 2);
