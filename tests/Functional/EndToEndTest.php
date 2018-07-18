@@ -6,6 +6,7 @@ namespace UMA\JsonRpc\Tests\Functional;
 
 use PHPUnit\Framework\TestCase;
 use UMA\DIC\Container;
+use UMA\JsonRpc\ConcurrentServer;
 use UMA\JsonRpc\Server;
 use UMA\JsonRpc\Tests\Fixture\Adder;
 use UMA\JsonRpc\Tests\Fixture\Subtractor;
@@ -16,7 +17,7 @@ class EndToEndTest extends TestCase
     /**
      * @dataProvider specExamplesProvider
      */
-    public function testFullOrchestra(string $input, ?string $expected): void
+    public function testRegularServer(string $input, ?string $expected): void
     {
         $container = new Container([
             Adder::class => new Adder(),
@@ -25,6 +26,27 @@ class EndToEndTest extends TestCase
         ]);
 
         $sut = (new Server($container))
+            ->set('get_data', MockProcedure::class)
+            ->set('notify_hello', MockProcedure::class)
+            ->set('sum', Adder::class)
+            ->set('subtract', Subtractor::class)
+            ->set('update', MockProcedure::class);
+
+        self::assertSame($expected, $sut->run($input));
+    }
+
+    /**
+     * @dataProvider specExamplesProvider
+     */
+    public function testConcurrentServer(string $input, ?string $expected): void
+    {
+        $container = new Container([
+            Adder::class => new Adder(),
+            Subtractor::class => new Subtractor(),
+            MockProcedure::class => new MockProcedure()
+        ]);
+
+        $sut = (new ConcurrentServer($container))
             ->set('get_data', MockProcedure::class)
             ->set('notify_hello', MockProcedure::class)
             ->set('sum', Adder::class)
