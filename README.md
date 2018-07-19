@@ -12,6 +12,7 @@ A modern [JSON-RPC 2.0] server for PHP 7.1
 	- [Creating Procedures](#creating-procedures)
 	- [Registering Services](#registering-services)
 	- [Running the Server](#running-the-server)
+- [Concurrent Server](#concurrent-server)
 - [FAQ](#faq)
 	- [Does JSON-RPC 2.0 have any advantage over REST?](#does-json-rpc-2.0-have-any-advantage-over-rest?)
 	- [How do you integrate `uma/json-rpc` with other frameworks?](#how-do-you-integrate-`uma/json-rpc`-with-other-frameworks?)
@@ -167,6 +168,17 @@ $response = $server->run('{"jsonrpc":"2.0","method":"add","params":[2,3],"id":1}
 // $response is '{"jsonrpc":"2.0","error":{"code":-32601,"message":"Method not found"},"id":1}'
 ```
 
+
+## Concurrent Server
+
+`UMA\JsonRpc\ConcurrentServer` has the same API as the regular `Server`, but it is an abomination than whenever
+receives a batch request it forks a child process to handle each sub-request, then waits for all them to finish.
+
+This server relies on the [PCNTL extension], therefore it can only be run from the command line on Unix OSes.
+
+It should be considered "experimental", I only wrote it to see if that concept was feasible.
+
+
 ## FAQ
 
 ### Does JSON-RPC 2.0 have any advantage over REST?
@@ -231,5 +243,6 @@ $response = $server->run('[
 
 
 [JSON-RPC 2.0]: http://www.jsonrpc.org/specification
+[PCNTL extension]: http://php.net/manual/en/intro.pcntl.php
 [avian carriers]: https://tools.ietf.org/html/rfc1149
 [Understanding JSON Schema]: https://spacetelescope.github.io/understanding-json-schema

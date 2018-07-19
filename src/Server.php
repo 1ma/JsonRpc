@@ -25,7 +25,7 @@ class Server
     /**
      * @var int|null
      */
-    private $batchLimit;
+    protected $batchLimit;
 
     public function __construct(ContainerInterface $container, int $batchLimit = null)
     {
@@ -60,7 +60,7 @@ class Server
         return $this->single($input);
     }
 
-    private function batch(Input $input): ?string
+    protected function batch(Input $input): ?string
     {
         \assert($input->isArray());
 
@@ -81,7 +81,7 @@ class Server
             null : \sprintf('[%s]', \implode(',', $responses));
     }
 
-    private function single(Input $input): ?string
+    protected function single(Input $input): ?string
     {
         if (!$input->isRpcRequest()) {
             return self::end(Error::invalidRequest());
@@ -112,14 +112,14 @@ class Server
         return self::end($procedure->execute($request), $request);
     }
 
-    private function tooManyBatchRequests(Input $input): bool
+    protected function tooManyBatchRequests(Input $input): bool
     {
         \assert($input->isArray());
 
         return \is_int($this->batchLimit) && $this->batchLimit < \count($input->decoded());
     }
 
-    private static function end(Response $response, Request $request = null): ?string
+    protected static function end(Response $response, Request $request = null): ?string
     {
         return $request instanceof Request && null === $request->id() ?
             null : \json_encode($response);
