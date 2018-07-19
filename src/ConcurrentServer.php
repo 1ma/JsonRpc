@@ -10,6 +10,8 @@ use UMA\JsonRpc\Internal\Input;
 /**
  * Experimental concurrent Server. Needs the pcntl extension,
  * therefore it can only work in the CLI SAPI.
+ *
+ * /!\ Probably NOT fit for production usage.
  */
 class ConcurrentServer extends Server
 {
