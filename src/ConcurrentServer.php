@@ -36,7 +36,7 @@ class ConcurrentServer extends Server
 
         $children = [];
         $responses = [];
-        foreach ($input->decoded() as $request) {
+        foreach ($input->data() as $request) {
             $pair = \stream_socket_pair(STREAM_PF_UNIX, STREAM_SOCK_STREAM, STREAM_IPPROTO_IP);
 
             $pid = \pcntl_fork();

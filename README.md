@@ -52,7 +52,7 @@ class Subtractor implements JsonRpc\Procedure
     /**
      * {@inheritdoc}
      */
-    public function execute(JsonRpc\Request $request): JsonRpc\Response
+    public function __invoke(JsonRpc\Request $request): JsonRpc\Response
     {
         $params = $request->params();
 
@@ -96,7 +96,7 @@ The logic assumes that `$request->params()` is either an array of two integers,
 or an `\stdClass` with a `minuend` and `subtrahend` attributes that are both integers.
 
 This is perfectly safe because the `Server` matches the JSON schema defined above against
-`$request->params()` before even calling `execute()`. Whenever the input does not conform
+`$request->params()` before even calling `__invoke()`. Whenever the input does not conform
 to the spec, a `-32602 (Invalid params)` error is returned and the procedure does not run.
 
 ### Registering Services
