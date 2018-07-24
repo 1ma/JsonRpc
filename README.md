@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/1ma/JsonRpc.svg?branch=master)](https://travis-ci.org/1ma/JsonRpc) [![Code Coverage](https://scrutinizer-ci.com/g/1ma/JsonRpc/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/1ma/JsonRpc/?branch=master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/1ma/JsonRpc/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/1ma/JsonRpc/?branch=master)
 
-A modern [JSON-RPC 2.0] server for PHP 7.1
+A modern, object-oriented [JSON-RPC 2.0] server for PHP 7.1 featuring JSON Schema integration and middlewares.
 
 
 # Table of Contents
@@ -108,9 +108,10 @@ the server. In this example I used `uma/dic`:
 declare(strict_types=1);
 
 use Demo\Subtractor;
+use UMA\DIC\Container;
 use UMA\JsonRpc\Server;
 
-$c = new \UMA\DIC\Container();
+$c = new Container();
 
 $c->set(Subtractor::class, function(): Subtractor {
     return new Subtractor();
@@ -119,7 +120,7 @@ $c->set(Subtractor::class, function(): Subtractor {
 $c->set(Server::class, function(Container $c): Server {
     $server = new Server($c);
     $server->set('subtract', Subtractor::class);
-    
+
     return $server;
 });
 ```
@@ -178,6 +179,135 @@ This server relies on the [PCNTL extension], therefore it can only be run from t
 
 It should be considered "experimental", I only wrote it to see if that concept was feasible.
 
+
+## Middlewares
+
+A middleware is a class implementing the `UMA\JsonRPC\Middleware` interface, whose only method accepts an `UMA\JsonRPC\Request`
+and a generic callable, and returns a `UMA\JsonRPC\Response`. At some point within its body, this method MUST call `$next($request)`,
+otherwise the request won't reach the successive middlewares nor the final procedure. Middlewares are the preferred
+option whenever you need to run a chunk of code right before or after every request, regardless of the method.
+
+Here's the minimal skeleton of a middleware:
+
+```php
+declare(strict_types=1);
+
+namespace Demo;
+
+use UMA\JsonRpc;
+
+class SampleMiddleware implements JsonRpc\Middleware
+{
+    public function __invoke(JsonRpc\Request $request, callable $next): JsonRpc\Response
+    {
+        // Code run before procedure
+
+        $response = $next($request);
+
+        // Code run after procedure finished
+
+        return $response;
+    }
+}
+```
+
+In order to activate a middleware you need to register it as a service in the dependency injection container, just
+like procedures.
+
+```php
+declare(strict_types=1);
+
+use Demo\SampleMiddleware;
+use UMA\DIC\Container;
+use UMA\JsonRpc\Server;
+
+$c = new Container();
+
+$c->set(SampleMiddleware::class, function(): SampleMiddleware {
+    return new SampleMiddleware();
+});
+
+$c->set(Server::class, function(Container $c): Server {
+    $server = new Server($c);
+
+    // method definitions would go here...
+
+    $server->attach(SampleMiddleware::class);
+
+    return $server;
+});
+```
+
+### Middleware guarantees
+
+Whenever the flow of execution enters the `__invoke` method of a user-defined middleware, the following can be assumed
+about the request:
+
+* The original payload was a valid JSON-RPC 2.0 request.
+
+* Its `method` attribute points to a procedure that is actually registered in the server.
+
+* Its `params` attribute conforms to the Json Schema defined in the `getSchema()` of said procedure.
+
+
+In short, they are the same guarantees that can be made inside the procedure.
+
+### Middleware ordering
+
+In a way, middlewares can be thought of as decorators of the Server, each one adding a new layer.
+Hence, the last attached layer will be the first to run (and the last, when exiting out of the procedure).
+The [Slim framework documentation] depicts their own middlewaring system with the following image. The same
+applies to this one.
+
+![middleware depiction](https://www.slimframework.com/docs/v3/images/middleware.png)
+
+### Middleware example
+
+Suppose you wanted to enqueue incoming notifications to a Beanstalk tube and execute
+these out of the HTTP context in a separate process. Recall that a notification is a JSON-RPC
+request with no ID attribute. According to the JSON-RPC 2.0 spec, when a server receives one
+of these it has to run the method normally, but not return any output.
+
+Instead of placing that logic at the beginning of every procedure or in an awkward base class
+you can use a middleware similar to this, leveraging the fact that `Request` objects can be json-encoded back
+to the original payload:
+
+```php
+declare(strict_types=1);
+
+namespace Demo;
+
+use Pheanstalk\Pheanstalk;
+use UMA\JsonRpc;
+
+/**
+ * A middleware that enqueues all incoming notifications to a Beanstalkd tube,
+ * thus avoiding their execution overhead.
+ */
+class AsyncNotificationsMiddleware implements JsonRpc\Middleware
+{
+    /**
+     * @var Pheanstalk
+     */
+    private $producer;
+
+    public function __construct(Pheanstalk $producer)
+    {
+        $this->producer = $producer;
+    }
+
+    public function __invoke(JsonRpc\Request $request, callable $next): JsonRpc\Response
+    {
+        if (null === $request->id()) {
+            $this->producer->put(\json_encode($request));
+
+            return new JsonRpc\Success(null);
+        }
+
+        return $next($request);
+    }
+}
+```
 
 ## FAQ
 
@@ -247,5 +377,6 @@ $response = $server->run('[
 
 [JSON-RPC 2.0]: http://www.jsonrpc.org/specification
 [PCNTL extension]: http://php.net/manual/en/intro.pcntl.php
+[Slim framework documentation]: https://www.slimframework.com/docs/
 [avian carriers]: https://tools.ietf.org/html/rfc1149
 [Understanding JSON Schema]: https://spacetelescope.github.io/understanding-json-schema
