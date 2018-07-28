@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/1ma/JsonRpc.svg?branch=master)](https://travis-ci.org/1ma/JsonRpc) [![Code Coverage](https://scrutinizer-ci.com/g/1ma/JsonRpc/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/1ma/JsonRpc/?branch=master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/1ma/JsonRpc/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/1ma/JsonRpc/?branch=master)
 
-A modern, object-oriented [JSON-RPC 2.0] server for PHP 7.1 featuring JSON Schema integration and middlewares.
+A modern, object-oriented [JSON-RPC 2.0] server for PHP 7.1 featuring JSON Schema integration and middlewaring.
 
 
 # Table of Contents
@@ -13,8 +13,13 @@ A modern, object-oriented [JSON-RPC 2.0] server for PHP 7.1 featuring JSON Schem
 	- [Registering Services](#registering-services)
 	- [Running the Server](#running-the-server)
 - [Concurrent Server](#concurrent-server)
+- [Middlewares](#middlewares)
+	- [Middleware guarantees](#middleware-guarantees)
+	- [Middleware ordering](#middleware-ordering)
+	- [Middleware example](#middleware-example)
 - [FAQ](#faq)
 	- [Does JSON-RPC 2.0 have any advantage over REST?](#does-json-rpc-20-have-any-advantage-over-rest)
+	- [How can I attach a middleware to specific procedures instead of the whole Server?](#how-can-i-attach-a-middleware-to-specific-procedures-instead-of-the-whole-server)
 	- [How do you integrate `uma/json-rpc` with other frameworks?](#how-do-you-integrate-umajson-rpc-with-other-frameworks)
 - [Best Practices](#best-practices)
 	- [Rely on JSON schemas to validate params](#rely-on-json-schemas-to-validate-params)
@@ -254,10 +259,10 @@ In short, they are the same guarantees that can be made inside the procedure.
 
 ### Middleware ordering
 
-In a way, middlewares can be thought of as decorators of the Server, each one adding a new layer.
+In a way, middlewares can be thought of as decorators of the Server, each one wrapping it in a new layer.
 Hence, the last attached layer will be the first to run (and the last, when exiting out of the procedure).
 The [Slim framework documentation] depicts their own middlewaring system with the following image. The same
-applies to this one.
+principle applies to `uma\json-rpc`.
 
 ![middleware depiction](https://www.slimframework.com/docs/v3/images/middleware.png)
 
@@ -320,6 +325,39 @@ over [avian carriers] or sheets of paper. This is actually the reason why the in
 with plain strings. 
 
 Additionally, the spec is short and unambiguous and supports "fire and forget" calls and batch processing.
+
+### How can I attach a middleware to specific procedures instead of the whole Server?
+
+I made the conscious decision of not including this feature, because it increased the complexity of
+the Server a lot. Therefore middlewares are always run for all requests.
+
+However, as the user you can manually skip them when the method is not the one you want:
+
+```php
+use UMA\JsonRpc;
+
+class PickyMiddleware implements JsonRpc\Middleware
+{
+    /**
+     * @var string[]
+     */
+    private $targetMethods;
+
+    public function __construct(array $targetMethods)
+    {
+        $this->targetMethods = $targetMethods;
+    }
+
+    public function __invoke(JsonRpc\Request $request, callable $next): JsonRpc\Response
+    {
+        if (!in_array($request->method(), $this->targetMethods)) {
+            return $next($request);
+        }
+
+        // Actual logic goes here
+    }
+}
+```
 
 ### How do you integrate `uma/json-rpc` with other frameworks?
 
