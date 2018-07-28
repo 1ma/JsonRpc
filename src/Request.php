@@ -6,8 +6,13 @@ namespace UMA\JsonRpc;
 
 use UMA\JsonRpc\Internal\Input;
 
-class Request
+class Request implements \JsonSerializable
 {
+    /**
+     * @var mixed
+     */
+    private $raw;
+
     /**
      * @var int|string|null
      */
@@ -27,9 +32,11 @@ class Request
     {
         \assert($input->isRpcRequest());
 
-        $this->id = $input->decoded()->id ?? null;
-        $this->method = $input->decoded()->method;
-        $this->params = $input->decoded()->params ?? null;
+        $this->raw = $input->data();
+
+        $this->id = $this->raw->id ?? null;
+        $this->method = $this->raw->method;
+        $this->params = $this->raw->params ?? null;
     }
 
     /**
@@ -51,5 +58,10 @@ class Request
     public function params()
     {
         return $this->params;
+    }
+
+    public function jsonSerialize()
+    {
+        return $this->raw;
     }
 }

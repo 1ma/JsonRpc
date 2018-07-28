@@ -17,7 +17,7 @@ class InputTest extends TestCase
         $sut = Input::fromString($raw);
 
         self::assertTrue($sut->parsable());
-        self::assertEquals($sut->decoded(), \json_decode($raw));
+        self::assertEquals($sut->data(), \json_decode($raw));
 
         self::assertTrue($sut->isArray() || $sut->isRpcRequest());
     }
@@ -39,7 +39,7 @@ class InputTest extends TestCase
         $sut = Input::fromString($raw);
 
         self::assertFalse($sut->parsable());
-        self::assertNull($sut->decoded());
+        self::assertNull($sut->data());
 
         self::assertFalse($sut->isArray());
     }
@@ -61,7 +61,7 @@ class InputTest extends TestCase
         $sut = Input::fromString($raw);
 
         self::assertTrue($sut->parsable());
-        self::assertEquals($sut->decoded(), \json_decode($raw));
+        self::assertEquals($sut->data(), \json_decode($raw));
 
         self::assertFalse($sut->isArray());
     }

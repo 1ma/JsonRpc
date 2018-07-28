@@ -8,7 +8,7 @@ use UMA\JsonRpc;
 
 class MockProcedure implements JsonRpc\Procedure
 {
-    public function execute(JsonRpc\Request $request): JsonRpc\Response
+    public function __invoke(JsonRpc\Request $request): JsonRpc\Response
     {
         if ('get_data' === $request->method()) {
             return new JsonRpc\Success($request->id(), ['hello', 5]);

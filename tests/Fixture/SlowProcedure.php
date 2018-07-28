@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace UMA\JsonRpc\Tests\Fixture;
 
 use UMA\JsonRpc;
@@ -13,7 +15,7 @@ use UMA\JsonRpc;
  */
 class SlowProcedure implements JsonRpc\Procedure
 {
-    public function execute(JsonRpc\Request $request): JsonRpc\Response
+    public function __invoke(JsonRpc\Request $request): JsonRpc\Response
     {
         \sleep($request->params()->wait_time);
 

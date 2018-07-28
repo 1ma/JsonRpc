@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/1ma/JsonRpc.svg?branch=master)](https://travis-ci.org/1ma/JsonRpc) [![Code Coverage](https://scrutinizer-ci.com/g/1ma/JsonRpc/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/1ma/JsonRpc/?branch=master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/1ma/JsonRpc/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/1ma/JsonRpc/?branch=master)
 
-A modern [JSON-RPC 2.0] server for PHP 7.1
+A modern, object-oriented [JSON-RPC 2.0] server for PHP 7.1 featuring JSON Schema integration and middlewaring.
 
 
 # Table of Contents
@@ -13,9 +13,14 @@ A modern [JSON-RPC 2.0] server for PHP 7.1
 	- [Registering Services](#registering-services)
 	- [Running the Server](#running-the-server)
 - [Concurrent Server](#concurrent-server)
+- [Middlewares](#middlewares)
+	- [Middleware guarantees](#middleware-guarantees)
+	- [Middleware ordering](#middleware-ordering)
+	- [Middleware example](#middleware-example)
 - [FAQ](#faq)
-	- [Does JSON-RPC 2.0 have any advantage over REST?](#does-json-rpc-2.0-have-any-advantage-over-rest?)
-	- [How do you integrate `uma/json-rpc` with other frameworks?](#how-do-you-integrate-`uma/json-rpc`-with-other-frameworks?)
+	- [Does JSON-RPC 2.0 have any advantage over REST?](#does-json-rpc-20-have-any-advantage-over-rest)
+	- [How can I attach a middleware to specific procedures instead of the whole Server?](#how-can-i-attach-a-middleware-to-specific-procedures-instead-of-the-whole-server)
+	- [How do you integrate `uma/json-rpc` with other frameworks?](#how-do-you-integrate-umajson-rpc-with-other-frameworks)
 - [Best Practices](#best-practices)
 	- [Rely on JSON schemas to validate params](#rely-on-json-schemas-to-validate-params)
 	- [Defer actual work whenever possible](#defer-actual-work-whenever-possible)
@@ -52,7 +57,7 @@ class Subtractor implements JsonRpc\Procedure
     /**
      * {@inheritdoc}
      */
-    public function execute(JsonRpc\Request $request): JsonRpc\Response
+    public function __invoke(JsonRpc\Request $request): JsonRpc\Response
     {
         $params = $request->params();
 
@@ -96,7 +101,7 @@ The logic assumes that `$request->params()` is either an array of two integers,
 or an `\stdClass` with a `minuend` and `subtrahend` attributes that are both integers.
 
 This is perfectly safe because the `Server` matches the JSON schema defined above against
-`$request->params()` before even calling `execute()`. Whenever the input does not conform
+`$request->params()` before even calling `__invoke()`. Whenever the input does not conform
 to the spec, a `-32602 (Invalid params)` error is returned and the procedure does not run.
 
 ### Registering Services
@@ -108,9 +113,10 @@ the server. In this example I used `uma/dic`:
 declare(strict_types=1);
 
 use Demo\Subtractor;
+use UMA\DIC\Container;
 use UMA\JsonRpc\Server;
 
-$c = new \UMA\DIC\Container();
+$c = new Container();
 
 $c->set(Subtractor::class, function(): Subtractor {
     return new Subtractor();
@@ -119,7 +125,7 @@ $c->set(Subtractor::class, function(): Subtractor {
 $c->set(Server::class, function(Container $c): Server {
     $server = new Server($c);
     $server->set('subtract', Subtractor::class);
-    
+
     return $server;
 });
 ```
@@ -179,6 +185,135 @@ This server relies on the [PCNTL extension], therefore it can only be run from t
 It should be considered "experimental", I only wrote it to see if that concept was feasible.
 
 
+## Middlewares
+
+A middleware is a class implementing the `UMA\JsonRPC\Middleware` interface, whose only method accepts an `UMA\JsonRPC\Request`
+and a generic callable, and returns a `UMA\JsonRPC\Response`. At some point within its body, this method MUST call `$next($request)`,
+otherwise the request won't reach the successive middlewares nor the final procedure. Middlewares are the preferred
+option whenever you need to run a chunk of code right before or after every request, regardless of the method.
+
+Here's the minimal skeleton of a middleware:
+
+```php
+declare(strict_types=1);
+
+namespace Demo;
+
+use UMA\JsonRpc;
+
+class SampleMiddleware implements JsonRpc\Middleware
+{
+    public function __invoke(JsonRpc\Request $request, callable $next): JsonRpc\Response
+    {
+        // Code run before procedure
+
+        $response = $next($request);
+
+        // Code run after procedure finished
+
+        return $response;
+    }
+}
+```
+
+In order to activate a middleware you need to register it as a service in the dependency injection container, just
+like procedures.
+
+```php
+declare(strict_types=1);
+
+use Demo\SampleMiddleware;
+use UMA\DIC\Container;
+use UMA\JsonRpc\Server;
+
+$c = new Container();
+
+$c->set(SampleMiddleware::class, function(): SampleMiddleware {
+    return new SampleMiddleware();
+});
+
+$c->set(Server::class, function(Container $c): Server {
+    $server = new Server($c);
+
+    // method definitions would go here...
+
+    $server->attach(SampleMiddleware::class);
+
+    return $server;
+});
+```
+
+### Middleware guarantees
+
+Whenever the flow of execution enters the `__invoke` method of a user-defined middleware, the following can be assumed
+about the request:
+
+* The original payload was a valid JSON-RPC 2.0 request.
+
+* Its `method` attribute points to a procedure that is actually registered in the server.
+
+* Its `params` attribute conforms to the Json Schema defined in the `getSchema()` of said procedure.
+
+
+In short, they are the same guarantees that can be made inside the procedure.
+
+### Middleware ordering
+
+In a way, middlewares can be thought of as decorators of the Server, each one wrapping it in a new layer.
+Hence, the last attached layer will be the first to run (and the last, when exiting out of the procedure).
+The [Slim framework documentation] depicts their own middlewaring system with the following image. The same
+principle applies to `uma\json-rpc`.
+
+![middleware depiction](https://www.slimframework.com/docs/v3/images/middleware.png)
+
+### Middleware example
+
+Suppose you wanted to enqueue incoming notifications to a Beanstalk tube and execute
+these out of the HTTP context in a separate process. Recall that a notification is a JSON-RPC
+request with no ID attribute. According to the JSON-RPC 2.0 spec, when a server receives one
+of these it has to run the method normally, but not return any output.
+
+Instead of placing that logic at the beginning of every procedure or in an awkward base class
+you can use a middleware similar to this, leveraging the fact that `Request` objects can be json-encoded back
+to the original payload:
+
+```php
+declare(strict_types=1);
+
+namespace Demo;
+
+use Pheanstalk\Pheanstalk;
+use UMA\JsonRpc;
+
+/**
+ * A middleware that enqueues all incoming notifications to a Beanstalkd tube,
+ * thus avoiding their execution overhead.
+ */
+class AsyncNotificationsMiddleware implements JsonRpc\Middleware
+{
+    /**
+     * @var Pheanstalk
+     */
+    private $producer;
+
+    public function __construct(Pheanstalk $producer)
+    {
+        $this->producer = $producer;
+    }
+
+    public function __invoke(JsonRpc\Request $request, callable $next): JsonRpc\Response
+    {
+        if (null === $request->id()) {
+            $this->producer->put(\json_encode($request));
+
+            return new JsonRpc\Success(null);
+        }
+
+        return $next($request);
+    }
+}
+```
+
 ## FAQ
 
 ### Does JSON-RPC 2.0 have any advantage over REST?
@@ -190,6 +325,39 @@ over [avian carriers] or sheets of paper. This is actually the reason why the in
 with plain strings. 
 
 Additionally, the spec is short and unambiguous and supports "fire and forget" calls and batch processing.
+
+### How can I attach a middleware to specific procedures instead of the whole Server?
+
+I made the conscious decision of not including this feature, because it increased the complexity of
+the Server a lot. Therefore middlewares are always run for all requests.
+
+However, as the user you can manually skip them when the method is not the one you want:
+
+```php
+use UMA\JsonRpc;
+
+class PickyMiddleware implements JsonRpc\Middleware
+{
+    /**
+     * @var string[]
+     */
+    private $targetMethods;
+
+    public function __construct(array $targetMethods)
+    {
+        $this->targetMethods = $targetMethods;
+    }
+
+    public function __invoke(JsonRpc\Request $request, callable $next): JsonRpc\Response
+    {
+        if (!in_array($request->method(), $this->targetMethods)) {
+            return $next($request);
+        }
+
+        // Actual logic goes here
+    }
+}
+```
 
 ### How do you integrate `uma/json-rpc` with other frameworks?
 
@@ -222,12 +390,15 @@ the server must not send the response back (these kind of requests are called `N
 
 ### Cap the number of batch requests
 
-Batch requests are a denial of service vector, even if PHP was capable of processing these concurrently.
-A malicious client can potentially send hundreds or thousands of heavy requests, effectively clogging the resources of the server.
+When a `Server` is exposed over HTTP, batch requests are a denial of service vector (even if PHP was capable of processing them concurrently).
+A malicious client can potentially send a batch request with thousands of sub-requests, effectively clogging the resources of the server.
 
 To minimize that risk, `Server` has an optional `batchLimit` parameter that specifies the maximum number of
 batch requests that the server can handle. Setting it to 1 effectively disables batch processing, if you don't
 need that feature.
+
+PS. An attacker could also send hundreds or thousands of single requests, clogging the server all the same. But given that
+these are all individual HTTP requests they can be rate-limited at the webserver level.
 
 ```php
 $server = new \UMA\JsonRpc\Server($container, 2);
@@ -244,5 +415,6 @@ $response = $server->run('[
 
 [JSON-RPC 2.0]: http://www.jsonrpc.org/specification
 [PCNTL extension]: http://php.net/manual/en/intro.pcntl.php
+[Slim framework documentation]: https://www.slimframework.com/docs/
 [avian carriers]: https://tools.ietf.org/html/rfc1149
 [Understanding JSON Schema]: https://spacetelescope.github.io/understanding-json-schema
