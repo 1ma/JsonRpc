@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace UMA\JsonRpc;
 
-use Psr\Container\ContainerInterface;
 use UMA\JsonRpc\Internal\Input;
 
 /**
@@ -15,13 +14,6 @@ use UMA\JsonRpc\Internal\Input;
  */
 class ConcurrentServer extends Server
 {
-    public function __construct(ContainerInterface $container, int $batchLimit = null)
-    {
-        \pcntl_async_signals(true);
-
-        parent::__construct($container, $batchLimit);
-    }
-
     protected function batch(Input $input): ?string
     {
         \assert($input->isArray());
