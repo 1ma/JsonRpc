@@ -17,10 +17,6 @@ class ConcurrentServer extends Server
 {
     public function __construct(ContainerInterface $container, int $batchLimit = null)
     {
-        if (!\extension_loaded('pcntl')) {
-            throw new \RuntimeException('ConcurrentServer relies on the pcntl extension');
-        }
-
         \pcntl_async_signals(true);
 
         parent::__construct($container, $batchLimit);
