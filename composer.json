@@ -10,6 +10,7 @@
         "psr/container": "^1.0"
     },
     "require-dev": {
+        "phpmetrics/phpmetrics": "^2.4",
         "phpunit/phpunit": "^7.0",
         "uma/dic": "^1.0"
     },
@@ -27,7 +28,11 @@
         }
     },
     "scripts": {
-        "test": "php -dzend.assertions=1 -dassert.exception=1 vendor/bin/phpunit --testdox"
+        "test": "php -dzend.assertions=1 -dassert.exception=1 vendor/bin/phpunit --testdox",
+        "metrics": [
+            "@test",
+            "vendor/bin/phpmetrics --junit=./build/phpunit/junit.xml --report-html=./build/phpmetrics ."
+        ]
     },
     "config": {
         "sort-packages": true
