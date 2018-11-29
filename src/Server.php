@@ -72,6 +72,10 @@ class Server
         }
 
         if ($input->isArray()) {
+            if ($this->tooManyBatchRequests($input)) {
+                return self::end(Error::tooManyBatchRequests($this->batchLimit));
+            }
+
             return $this->batch($input);
         }
 
@@ -81,10 +85,6 @@ class Server
     protected function batch(Input $input): ?string
     {
         \assert($input->isArray());
-
-        if ($this->tooManyBatchRequests($input)) {
-            return self::end(Error::tooManyBatchRequests($this->batchLimit));
-        }
 
         $responses = [];
         foreach ($input->data() as $request) {

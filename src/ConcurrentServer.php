@@ -30,10 +30,6 @@ class ConcurrentServer extends Server
     {
         \assert($input->isArray());
 
-        if ($this->tooManyBatchRequests($input)) {
-            return self::end(Error::tooManyBatchRequests($this->batchLimit));
-        }
-
         $children = [];
         $responses = [];
         foreach ($input->data() as $request) {
