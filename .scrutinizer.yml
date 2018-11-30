@@ -23,5 +23,5 @@ build:
                     -
                         command: composer test
                         coverage:
-                            file: build/coverage.xml
+                            file: build/clover.xml
                             format: php-clover
