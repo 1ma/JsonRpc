@@ -107,7 +107,7 @@ class Server
 
         $request = new Request($input);
 
-        if (!array_key_exists($request->method(), $this->methods)) {
+        if (!\array_key_exists($request->method(), $this->methods)) {
             return self::end(Error::unknownMethod($request->id()), $request);
         }
 
