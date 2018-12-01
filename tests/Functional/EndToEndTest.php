@@ -41,6 +41,11 @@ class EndToEndTest extends TestCase
      */
     public function testConcurrentServer(string $input, ?string $expected): void
     {
+        // This is the 'rpc call Batch' test
+        if (366 === \strlen($input)) {
+            self::markTestSkipped('For batch requests ConcurrentServer does not guarantee the order of each response');
+        }
+
         $container = new Container([
             Adder::class => new Adder(),
             Subtractor::class => new Subtractor(),
@@ -162,25 +167,23 @@ class EndToEndTest extends TestCase
 
         $time = (int)(microtime(true) * 10**6);
         $response = $server->run('[
-          {"jsonrpc": "2.0", "method": "slow", "params": {"wait_time": 1}, "id": "0"},
-          {"jsonrpc": "2.0", "method": "slow", "params": {"wait_time": 1}, "id": "1"},
-          {"jsonrpc": "2.0", "method": "slow", "params": {"wait_time": 1}, "id": "2"},
-          {"jsonrpc": "2.0", "method": "slow", "params": {"wait_time": 1}, "id": "3"},
-          {"jsonrpc": "2.0", "method": "slow", "params": {"wait_time": 1}, "id": "4"},
-          {"jsonrpc": "2.0", "method": "slow", "params": {"wait_time": 1}, "id": "5"},
-          {"jsonrpc": "2.0", "method": "slow", "params": {"wait_time": 1}, "id": "6"},
-          {"jsonrpc": "2.0", "method": "slow", "params": {"wait_time": 1}, "id": "7"},
-          {"jsonrpc": "2.0", "method": "slow", "params": {"wait_time": 1}, "id": "8"},
-          {"jsonrpc": "2.0", "method": "slow", "params": {"wait_time": 1}, "id": "9"}
+          {"jsonrpc": "2.0", "method": "slow", "params": {"wait_time": 500000}, "id": "0"},
+          {"jsonrpc": "2.0", "method": "slow", "params": {"wait_time": 400000}, "id": "1"},
+          {"jsonrpc": "2.0", "method": "slow", "params": {"wait_time": 300000}, "id": "2"},
+          {"jsonrpc": "2.0", "method": "slow", "params": {"wait_time": 200000}, "id": "3"},
+          {"jsonrpc": "2.0", "method": "slow", "params": {"wait_time": 100000}, "id": "4"}
         ]');
         $time = (int)(microtime(true) * 10**6) - $time;
 
-        // The server has to take less than 1.5s to process
-        // all 10 requests instead of the usual 10s.
-        self::assertTrue($time < 1500000);
+        // The server has to take less than 0.6s to process
+        // all 5 requests instead of the usual 1.5s.
+        self::assertLessThan(600000, $time);
 
+        // Since the ConcurrentServer writes the result of each individual request
+        // as soon as it is available, the final response has to be in reverse order
+        // in this particular test run.
         self::assertSame(
-            '[{"jsonrpc":"2.0","result":"0","id":"0"},{"jsonrpc":"2.0","result":"1","id":"1"},{"jsonrpc":"2.0","result":"2","id":"2"},{"jsonrpc":"2.0","result":"3","id":"3"},{"jsonrpc":"2.0","result":"4","id":"4"},{"jsonrpc":"2.0","result":"5","id":"5"},{"jsonrpc":"2.0","result":"6","id":"6"},{"jsonrpc":"2.0","result":"7","id":"7"},{"jsonrpc":"2.0","result":"8","id":"8"},{"jsonrpc":"2.0","result":"9","id":"9"}]',
+            '[{"jsonrpc":"2.0","result":"4","id":"4"},{"jsonrpc":"2.0","result":"3","id":"3"},{"jsonrpc":"2.0","result":"2","id":"2"},{"jsonrpc":"2.0","result":"1","id":"1"},{"jsonrpc":"2.0","result":"0","id":"0"}]',
             $response
         );
     }
