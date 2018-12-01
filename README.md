@@ -50,6 +50,7 @@ declare(strict_types=1);
 
 namespace Demo;
 
+use stdClass;
 use UMA\JsonRpc;
 
 class Subtractor implements JsonRpc\Procedure
@@ -61,7 +62,7 @@ class Subtractor implements JsonRpc\Procedure
     {
         $params = $request->params();
 
-        if ($params instanceof \stdClass) {
+        if ($params instanceof stdClass) {
             $minuend = $params->minuend;
             $subtrahend = $params->subtrahend;
         } else {
@@ -74,7 +75,7 @@ class Subtractor implements JsonRpc\Procedure
     /**
      * {@inheritdoc}
      */
-    public function getSpec(): ?\stdClass
+    public function getSpec(): ?stdClass
     {
         return \json_decode(<<<'JSON'
 {
@@ -98,7 +99,7 @@ JSON
 ```
 
 The logic assumes that `$request->params()` is either an array of two integers,
-or an `\stdClass` with a `minuend` and `subtrahend` attributes that are both integers.
+or an `stdClass` with a `minuend` and `subtrahend` attributes that are both integers.
 
 This is perfectly safe because the `Server` matches the JSON schema defined above against
 `$request->params()` before even calling `__invoke()`. Whenever the input does not conform

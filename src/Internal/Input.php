@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace UMA\JsonRpc\Internal;
 
+use stdClass;
+
 class Input
 {
     /**
@@ -37,7 +39,7 @@ class Input
 JSON;
 
     /**
-     * @var \stdClass
+     * @var stdClass
      */
     private static $schema;
 
@@ -86,7 +88,7 @@ JSON;
 
     public function isRpcRequest(): bool
     {
-        if (!self::$schema instanceof \stdClass) {
+        if (!self::$schema instanceof stdClass) {
             self::$schema = \json_decode(self::INPUT_SCHEMA);
         }
 

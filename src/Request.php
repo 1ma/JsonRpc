@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace UMA\JsonRpc;
 
+use stdClass;
 use UMA\JsonRpc\Internal\Input;
 
 class Request implements \JsonSerializable
@@ -24,7 +25,7 @@ class Request implements \JsonSerializable
     private $method;
 
     /**
-     * @var \stdClass|array|null
+     * @var stdClass|array|null
      */
     private $params;
 
@@ -53,7 +54,7 @@ class Request implements \JsonSerializable
     }
 
     /**
-     * @return \stdClass|array|null
+     * @return stdClass|array|null
      */
     public function params()
     {
