@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace UMA\JsonRpc\Tests\Unit;
 
+use LogicException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerExceptionInterface;
+use TypeError;
 use UMA\DIC\Container;
 use UMA\JsonRpc\Server;
 use UMA\JsonRpc\Tests\Fixture\LoggingMiddleware;
@@ -32,42 +34,40 @@ class ServerTest extends TestCase
 
     public function testAddingANonExistentProcedureService(): void
     {
-        $this->expectException(\LogicException::class);
+        $this->expectException(LogicException::class);
 
         $this->sut->set('subtract', Subtractor::class);
     }
 
     public function testAddingANonExistentMiddlewareService(): void
     {
-        $this->expectException(\LogicException::class);
+        $this->expectException(LogicException::class);
 
         $this->sut->attach(LoggingMiddleware::class);
     }
 
     public function testInvalidProcedureService(): void
     {
+        $this->expectException(TypeError::class);
+
         $this->container->set(Subtractor::class, 'this is not a Procedure!');
 
         $this->sut->set('subtract', Subtractor::class);
 
-        self::assertSame(
-            '{"jsonrpc":"2.0","error":{"code":-32603,"message":"Internal error"},"id":1}',
-            $this->sut->run('{"jsonrpc": "2.0", "method": "subtract", "params": [42, 23], "id": 1}')
-        );
+        $this->sut->run('{"jsonrpc": "2.0", "method": "subtract", "params": [42, 23], "id": 1}');
     }
 
     public function testInvalidMiddleware(): void
     {
+        $this->expectException(TypeError::class);
+
         $this->container->set(Subtractor::class, new Subtractor);
         $this->container->set(LoggingMiddleware::class, 'This is not a Middleware!');
 
         $this->sut->set('subtract', Subtractor::class);
         $this->sut->attach(LoggingMiddleware::class);
 
-        self::assertSame(
-            '{"jsonrpc":"2.0","error":{"code":-32603,"message":"Internal error"},"id":1}',
-            $this->sut->run('{"jsonrpc": "2.0", "method": "subtract", "params": [42, 23], "id": 1}')
-        );
+        $this->sut->run('{"jsonrpc": "2.0", "method": "subtract", "params": [42, 23], "id": 1}');
     }
 
     public function testInvalidParams(): void

@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace UMA\JsonRpc\Tests\Fixture;
 
+use stdClass;
 use UMA\JsonRpc;
 
 class Subtractor implements JsonRpc\Procedure
 {
-    public function __invoke(JsonRpc\Request $request): JsonRpc\Response
+    public function execute(JsonRpc\Request $request): JsonRpc\Response
     {
         $params = $request->params();
 
-        if ($params instanceof \stdClass) {
+        if ($params instanceof stdClass) {
             $minuend = $params->minuend;
             $subtrahend = $params->subtrahend;
         } else {
@@ -22,7 +23,7 @@ class Subtractor implements JsonRpc\Procedure
         return new JsonRpc\Success($request->id(), $minuend - $subtrahend);
     }
 
-    public function getSpec(): ?\stdClass
+    public function getSpec(): ?stdClass
     {
         return \json_decode(<<<'JSON'
 {

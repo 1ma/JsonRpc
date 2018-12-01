@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace UMA\JsonRpc;
 
+use LogicException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use UMA\JsonRpc\Internal\Pipeliner;
-use UMA\JsonRpc\Internal\Validator;
+use stdClass;
+use TypeError;
+use UMA\JsonRpc\Internal\Assert;
 use UMA\JsonRpc\Internal\Input;
+use UMA\JsonRpc\Internal\MiddlewareStack;
+use UMA\JsonRpc\Internal\Validator;
 
 class Server
 {
@@ -44,7 +48,7 @@ class Server
     public function set(string $method, string $serviceId): Server
     {
         if (!$this->container->has($serviceId)) {
-            throw new \LogicException("Cannot find service '$serviceId' in the container");
+            throw new LogicException("Cannot find service '$serviceId' in the container");
         }
 
         $this->methods[$method] = $serviceId;
@@ -55,7 +59,7 @@ class Server
     public function attach(string $serviceId): Server
     {
         if (!$this->container->has($serviceId)) {
-            throw new \LogicException("Cannot find service '$serviceId' in the container");
+            throw new LogicException("Cannot find service '$serviceId' in the container");
         }
 
         $this->middlewares[$serviceId] = null;
@@ -63,6 +67,9 @@ class Server
         return $this;
     }
 
+    /**
+     * @throws TypeError
+     */
     public function run(string $raw): ?string
     {
         $input = Input::fromString($raw);
@@ -99,6 +106,9 @@ class Server
             null : \sprintf('[%s]', \implode(',', $responses));
     }
 
+    /**
+     * @throws TypeError
+     */
     protected function single(Input $input): ?string
     {
         if (!$input->isRpcRequest()) {
@@ -112,28 +122,27 @@ class Server
         }
 
         try {
-            $procedure = $this->container->get($this->methods[$request->method()]);
+            $procedure = Assert::isProcedure(
+                $this->container->get($this->methods[$request->method()])
+            );
         } catch (ContainerExceptionInterface | NotFoundExceptionInterface $e) {
-            return self::end(Error::internal($request->id()), $request);
-        }
-
-        if (!$procedure instanceof Procedure) {
             return self::end(Error::internal($request->id()), $request);
         }
 
         $spec = $procedure->getSpec();
 
-        if ($spec instanceof \stdClass && !Validator::validate($spec, $request->params())) {
+        if ($spec instanceof stdClass && !Validator::validate($spec, $request->params())) {
             return self::end(Error::invalidParams($request->id()), $request);
         }
 
-        try {
-            $pipeline = Pipeliner::build($this->container, $procedure, $this->middlewares);
-        } catch (\Throwable $t) {
-            return self::end(Error::internal($request->id()), $request);
-        }
+        $stack = MiddlewareStack::compose(
+            $procedure,
+            ...\array_map(function(string $serviceId) {
+                return $this->container->get($serviceId);
+            }, \array_keys($this->middlewares))
+        );
 
-        return self::end($pipeline($request), $request);
+        return self::end($stack->execute($request), $request);
     }
 
     protected function tooManyBatchRequests(Input $input): bool

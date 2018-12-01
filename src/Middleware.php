@@ -11,8 +11,8 @@ interface Middleware
 {
     /**
      * Run some code before or after the target Procedure. Within the body
-     * of this method, you MUST call $next($request) somewhere and return
-     * that result (it is guaranteed to be a Response).
+     * of this method, at some point you MUST call $next->execute($request)
+     * and return the result.
      */
-    public function __invoke(Request $request, callable $next): Response;
+    public function process(Request $request, Procedure $next): Response;
 }

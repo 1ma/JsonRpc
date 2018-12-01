@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace UMA\JsonRpc\Tests\Fixture;
 
+use stdClass;
 use UMA\JsonRpc;
 
 class Adder implements JsonRpc\Procedure
 {
-    public function __invoke(JsonRpc\Request $request): JsonRpc\Response
+    public function execute(JsonRpc\Request $request): JsonRpc\Response
     {
         // $request->params() is *guaranteed* to be an array of
         // integers due to the JsonSchema defined in getSpec()
@@ -23,7 +24,7 @@ class Adder implements JsonRpc\Procedure
         return new JsonRpc\Success($request->id(), $sum);
     }
 
-    public function getSpec(): ?\stdClass
+    public function getSpec(): ?stdClass
     {
         return \json_decode(<<<'JSON'
 {

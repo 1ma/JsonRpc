@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace UMA\JsonRpc\Tests\Fixture;
 
+use stdClass;
 use UMA\JsonRpc;
 
 /**
@@ -15,14 +16,14 @@ use UMA\JsonRpc;
  */
 class SlowProcedure implements JsonRpc\Procedure
 {
-    public function __invoke(JsonRpc\Request $request): JsonRpc\Response
+    public function execute(JsonRpc\Request $request): JsonRpc\Response
     {
         \usleep($request->params()->wait_time);
 
         return new JsonRpc\Success($request->id(), $request->id());
     }
 
-    public function getSpec(): ?\stdClass
+    public function getSpec(): ?stdClass
     {
         return \json_decode(<<<'JSON'
 {
