@@ -27,7 +27,7 @@ class Server
     private $methods;
 
     /**
-     * @var Middleware[]
+     * @var string[]
      */
     private $middlewares;
 
@@ -139,7 +139,7 @@ class Server
             }, \array_keys($this->middlewares))
         );
 
-        return self::end($stack->execute($request), $request);
+        return self::end($stack($request), $request);
     }
 
     protected function tooManyBatchRequests(Input $input): bool

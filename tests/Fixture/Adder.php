@@ -9,7 +9,7 @@ use UMA\JsonRpc;
 
 class Adder implements JsonRpc\Procedure
 {
-    public function execute(JsonRpc\Request $request): JsonRpc\Response
+    public function __invoke(JsonRpc\Request $request): JsonRpc\Response
     {
         // $request->params() is *guaranteed* to be an array of
         // integers due to the JsonSchema defined in getSpec()

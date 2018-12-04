@@ -18,11 +18,11 @@ class LoggingMiddleware implements JsonRpc\Middleware
      */
     private $responses;
 
-    public function process(JsonRpc\Request $request, JsonRpc\Procedure $next): JsonRpc\Response
+    public function __invoke(JsonRpc\Request $request, JsonRpc\Procedure $next): JsonRpc\Response
     {
         $this->requests[] = \json_encode($request);
 
-        $response = $next->execute($request);
+        $response = $next($request);
 
         $this->responses[] = \json_encode($response);
 
