@@ -16,7 +16,7 @@ use UMA\JsonRpc;
  */
 class SlowProcedure implements JsonRpc\Procedure
 {
-    public function execute(JsonRpc\Request $request): JsonRpc\Response
+    public function __invoke(JsonRpc\Request $request): JsonRpc\Response
     {
         \usleep($request->params()->wait_time);
 

@@ -9,7 +9,7 @@ use UMA\JsonRpc;
 
 class Subtractor implements JsonRpc\Procedure
 {
-    public function execute(JsonRpc\Request $request): JsonRpc\Response
+    public function __invoke(JsonRpc\Request $request): JsonRpc\Response
     {
         $params = $request->params();
 

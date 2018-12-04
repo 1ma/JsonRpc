@@ -39,9 +39,9 @@ final class MiddlewareStack implements JsonRpc\Procedure
     /**
      * {@inheritdoc}
      */
-    public function execute(JsonRpc\Request $request): JsonRpc\Response
+    public function __invoke(JsonRpc\Request $request): JsonRpc\Response
     {
-        return $this->middleware->process($request, $this->next);
+        return ($this->middleware)($request, $this->next);
     }
 
     /**

@@ -34,7 +34,7 @@ final class MiddlewareStackTest extends TestCase
         $payload->params = [1, 2, 3];
         $payload->id = '1';
 
-        $response = $stack->execute(new Request(Input::fromSafeData($payload)));
+        $response = $stack(new Request(Input::fromSafeData($payload)));
 
         self::assertSame([
             'jsonrpc' => '2.0',
