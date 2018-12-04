@@ -129,9 +129,7 @@ class Server
             return self::end(Error::internal($request->id()), $request);
         }
 
-        $spec = $procedure->getSpec();
-
-        if ($spec instanceof stdClass && !Validator::validate($spec, $request->params())) {
+        if (!Validator::validate($procedure->getSpec(), $request->params())) {
             return self::end(Error::invalidParams($request->id()), $request);
         }
 

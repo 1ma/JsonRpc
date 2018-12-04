@@ -10,14 +10,18 @@ use stdClass;
 final class Validator
 {
     /**
-     * @param stdClass $schema The schema to check against the given data
-     * @param mixed     $data   The data to validate (MUST be decoded JSON data)
+     * @param stdClass|null $schema The schema to check against the given data. May be null
+     * @param mixed         $data   The data to validate (MUST be decoded JSON data)
      *
      * @return bool Whether $data conforms to $schema or not
      */
-    public static function validate(stdClass $schema, $data): bool
+    public static function validate(?stdClass $schema, $data): bool
     {
         \assert(false !== \json_encode($data));
+
+        if (null === $schema) {
+            return true;
+        }
 
         return (new OpisValidator)
             ->dataValidation($data, $schema)
