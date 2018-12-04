@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace UMA\JsonRpc;
 
-class Error extends Response
+final class Error extends Response
 {
     /**
      * @var int

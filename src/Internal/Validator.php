@@ -7,7 +7,7 @@ namespace UMA\JsonRpc\Internal;
 use Opis\JsonSchema\Validator as OpisValidator;
 use stdClass;
 
-class Validator
+final class Validator
 {
     /**
      * @param stdClass $schema The schema to check against the given data
