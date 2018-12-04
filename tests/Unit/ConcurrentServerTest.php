@@ -9,7 +9,7 @@ use UMA\DIC\Container;
 use UMA\JsonRpc\ConcurrentServer;
 use UMA\JsonRpc\Tests\Fixture\Subtractor;
 
-class ConcurrentServerTest extends TestCase
+final class ConcurrentServerTest extends TestCase
 {
     public function testTooManyBatchRequestsSent(): void
     {
