@@ -8,7 +8,6 @@ use LogicException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use stdClass;
 use TypeError;
 use UMA\JsonRpc\Internal\Assert;
 use UMA\JsonRpc\Internal\Input;

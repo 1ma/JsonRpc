@@ -40,7 +40,7 @@ final class ConcurrentServer extends Server
             $children[$pid] = $pair[0];
         }
 
-        while(-1 !== $pid = \pcntl_wait($status)) {
+        while (-1 !== $pid = \pcntl_wait($status)) {
             $socket = $children[$pid];
 
             if ('' !== $response = \trim(\fgets($socket))) {
