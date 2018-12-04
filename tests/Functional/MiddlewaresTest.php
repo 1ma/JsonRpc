@@ -10,7 +10,7 @@ use UMA\JsonRpc\Server;
 use UMA\JsonRpc\Tests\Fixture\LoggingMiddleware;
 use UMA\JsonRpc\Tests\Fixture\Subtractor;
 
-class MiddlewaresTest extends TestCase
+final class MiddlewaresTest extends TestCase
 {
     /**
      * @var Server

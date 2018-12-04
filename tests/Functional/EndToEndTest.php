@@ -13,7 +13,7 @@ use UMA\JsonRpc\Tests\Fixture\SlowProcedure;
 use UMA\JsonRpc\Tests\Fixture\Subtractor;
 use UMA\JsonRpc\Tests\Fixture\MockProcedure;
 
-class EndToEndTest extends TestCase
+final class EndToEndTest extends TestCase
 {
     /**
      * @dataProvider specExamplesProvider

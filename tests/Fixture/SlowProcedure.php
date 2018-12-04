@@ -14,7 +14,7 @@ use UMA\JsonRpc;
  * Its purpose is demonstrating that the ConcurrentServer can run a
  * small batch of SlowProcedures in roughly the same time as just one.
  */
-class SlowProcedure implements JsonRpc\Procedure
+final class SlowProcedure implements JsonRpc\Procedure
 {
     public function __invoke(JsonRpc\Request $request): JsonRpc\Response
     {

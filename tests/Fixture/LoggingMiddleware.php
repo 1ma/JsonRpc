@@ -6,7 +6,7 @@ namespace UMA\JsonRpc\Tests\Fixture;
 
 use UMA\JsonRpc;
 
-class LoggingMiddleware implements JsonRpc\Middleware
+final class LoggingMiddleware implements JsonRpc\Middleware
 {
     /**
      * @var string[]

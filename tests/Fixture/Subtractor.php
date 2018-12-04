@@ -7,7 +7,7 @@ namespace UMA\JsonRpc\Tests\Fixture;
 use stdClass;
 use UMA\JsonRpc;
 
-class Subtractor implements JsonRpc\Procedure
+final class Subtractor implements JsonRpc\Procedure
 {
     public function __invoke(JsonRpc\Request $request): JsonRpc\Response
     {

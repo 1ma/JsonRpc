@@ -7,7 +7,7 @@ namespace UMA\JsonRpc\Tests\Fixture;
 use stdClass;
 use UMA\JsonRpc;
 
-class MockProcedure implements JsonRpc\Procedure
+final class MockProcedure implements JsonRpc\Procedure
 {
     public function __invoke(JsonRpc\Request $request): JsonRpc\Response
     {
