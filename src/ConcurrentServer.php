@@ -12,7 +12,7 @@ use UMA\JsonRpc\Internal\Input;
  *
  * /!\ Probably NOT fit for production usage.
  */
-class ConcurrentServer extends Server
+final class ConcurrentServer extends Server
 {
     protected function batch(Input $input): ?string
     {

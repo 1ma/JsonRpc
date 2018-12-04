@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace UMA\JsonRpc;
 
-class Success extends Response
+final class Success extends Response
 {
     /**
      * @var mixed|null

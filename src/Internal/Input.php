@@ -6,7 +6,7 @@ namespace UMA\JsonRpc\Internal;
 
 use stdClass;
 
-class Input
+final class Input
 {
     /**
      * This is the minimal schema that all incoming payloads must

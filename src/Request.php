@@ -7,7 +7,7 @@ namespace UMA\JsonRpc;
 use stdClass;
 use UMA\JsonRpc\Internal\Input;
 
-class Request implements \JsonSerializable
+final class Request implements \JsonSerializable
 {
     /**
      * @var mixed
