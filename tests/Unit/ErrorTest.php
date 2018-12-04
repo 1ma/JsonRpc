@@ -7,7 +7,7 @@ namespace UMA\JsonRpc\Tests\Unit;
 use PHPUnit\Framework\TestCase;
 use UMA\JsonRpc\Error;
 
-class ErrorTest extends TestCase
+final class ErrorTest extends TestCase
 {
     public function testErrorResponses(): void
     {

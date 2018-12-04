@@ -7,7 +7,7 @@ namespace UMA\JsonRpc\Tests\Unit;
 use PHPUnit\Framework\TestCase;
 use UMA\JsonRpc\Internal\Input;
 
-class InputTest extends TestCase
+final class InputTest extends TestCase
 {
     /**
      * @dataProvider validInputsProvider
