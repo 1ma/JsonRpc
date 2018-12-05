@@ -188,8 +188,8 @@ It should be considered "experimental", I only wrote it to see if that concept w
 
 ## Middlewares
 
-A middleware is a class implementing the `UMA\JsonRPC\Middleware` interface, whose only method accepts an `UMA\JsonRPC\Request`
-and a generic callable, and returns a `UMA\JsonRPC\Response`. At some point within its body, this method MUST call `$next($request)`,
+A middleware is a class implementing the `UMA\JsonRPC\Middleware` interface, whose only method accepts an `UMA\JsonRPC\Request`,
+an `UMA\JsonRPC\Procedure` and returns a `UMA\JsonRPC\Response`. At some point within its body, this method MUST call `$next($request)`,
 otherwise the request won't reach the successive middlewares nor the final procedure. Middlewares are the preferred
 option whenever you need to run a chunk of code right before or after every request, regardless of the method.
 
@@ -204,7 +204,7 @@ use UMA\JsonRpc;
 
 class SampleMiddleware implements JsonRpc\Middleware
 {
-    public function __invoke(JsonRpc\Request $request, callable $next): JsonRpc\Response
+    public function __invoke(JsonRpc\Request $request, JsonRPC\Procedure $next): JsonRpc\Response
     {
         // Code run before procedure
 
@@ -302,7 +302,7 @@ class AsyncNotificationsMiddleware implements JsonRpc\Middleware
         $this->producer = $producer;
     }
 
-    public function __invoke(JsonRpc\Request $request, callable $next): JsonRpc\Response
+    public function __invoke(JsonRpc\Request $request, JsonRPC\Procedure $next): JsonRpc\Response
     {
         if (null === $request->id()) {
             $this->producer->put(\json_encode($request));
@@ -349,7 +349,7 @@ class PickyMiddleware implements JsonRpc\Middleware
         $this->targetMethods = $targetMethods;
     }
 
-    public function __invoke(JsonRpc\Request $request, callable $next): JsonRpc\Response
+    public function __invoke(JsonRpc\Request $request, JsonRPC\Procedure $next): JsonRpc\Response
     {
         if (!in_array($request->method(), $this->targetMethods)) {
             return $next($request);
