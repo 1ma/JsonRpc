@@ -1,3 +1,7 @@
+### [2.1.0] - 2019-08-02
+
+  * (Feature) Transparently decode Json payloads with the [simdjson](https://github.com/crazyxman/simdjson_php) PHP bindings when they are available.
+
 ### [2.0.0] - 2018-12-05
 
   * (Breaking Change) Made `Middleware::__invoke()` type safe by passing a `Procedure` instead of `callable` as the second parameter. Requires a typehint rewrite in all descendants.
@@ -22,6 +26,7 @@
 
   * Initial pre-release
 
+[2.1.0]: https://github.com/1ma/JsonRpc/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/1ma/JsonRpc/compare/v1.0.0...v2.0.0
 [1.0.0]: https://github.com/1ma/JsonRpc/compare/v0.9.0...v1.0.0
 [0.9.0]: https://github.com/1ma/JsonRpc/commit/081b048bb5a5a58235953dd42772ff31256a9e49

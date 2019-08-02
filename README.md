@@ -12,6 +12,7 @@ A modern, object-oriented [JSON-RPC 2.0] server for PHP 7.1 featuring JSON Schem
 	- [Creating Procedures](#creating-procedures)
 	- [Registering Services](#registering-services)
 	- [Running the Server](#running-the-server)
+- [Json Parsing](#json-parsing)
 - [Concurrent Server](#concurrent-server)
 - [Middlewares](#middlewares)
 	- [Middleware guarantees](#middleware-guarantees)
@@ -174,6 +175,15 @@ $response = $server->run('invalid input {?<derp');
 $response = $server->run('{"jsonrpc":"2.0","method":"add","params":[2,3],"id":1}');
 // $response is '{"jsonrpc":"2.0","error":{"code":-32601,"message":"Method not found"},"id":1}'
 ```
+
+
+## Json Parsing
+
+The library will try to decode Json payloads using the [simdjson PHP bindings] if they are available. When not
+available the builtin `json_decode()` function will be used instead.
+
+These bindings integrate a [C++ Json decoder] written by Daniel Lemire into PHP. In the synthetic benchmarks bundled
+with the extension it shows speedups ranging between 1.4x and 2x compared to `json_decode()`.
 
 
 ## Concurrent Server
@@ -415,6 +425,8 @@ $response = $server->run('[
 
 
 [JSON-RPC 2.0]: http://www.jsonrpc.org/specification
+[simdjson PHP bindings]: https://github.com/crazyxman/simdjson_php
+[C++ Json decoder]: https://github.com/lemire/simdjson
 [PCNTL extension]: http://php.net/manual/en/intro.pcntl.php
 [Slim framework documentation]: https://www.slimframework.com/docs/
 [avian carriers]: https://tools.ietf.org/html/rfc1149
