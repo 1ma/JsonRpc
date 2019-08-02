@@ -9,36 +9,6 @@ use stdClass;
 final class Input
 {
     /**
-     * This is the minimal schema that all incoming payloads must
-     * conform to in order to be considered actual JSON-RPC requests.
-     */
-    private const INPUT_SCHEMA = <<<'JSON'
-{
-  "$schema": "https://json-schema.org/draft-07/schema#",
-  "description": "JSON-RPC 2.0 single request schema",
-
-  "type": "object",
-  "required": ["jsonrpc", "method"],
-  "additionalProperties": false,
-  "properties": {
-    "jsonrpc": {
-      "type": "string",
-      "enum": ["2.0"]
-    },
-    "method": {
-      "type": "string"
-    },
-    "params": {
-      "type": ["array", "object"]
-    },
-    "id": {
-      "type": ["integer", "string"]
-    }
-  }
-}
-JSON;
-
-    /**
      * @var stdClass
      */
     private static $schema;
@@ -57,6 +27,33 @@ JSON;
     {
         $this->data = $data;
         $this->error = $error;
+
+        // This is the minimal schema that all incoming payloads must
+        // conform to in order to be considered well-formed JSON-RPC requests.
+        if (!self::$schema instanceof stdClass) {
+            self::$schema = (object)[
+                '$schema' => 'https://json-schema.org/draft-07/schema#',
+                'description' => 'JSON-RPC 2.0 single request schema',
+                'type' => 'object',
+                'required' => ['jsonrpc', 'method'],
+                'additionalProperties' => false,
+                'properties' => (object)[
+                    'jsonrpc' => (object)[
+                        'type' => 'string',
+                        'enum' => ['2.0']
+                    ],
+                    'method' => (object)[
+                        'type' => 'string'
+                    ],
+                    'params' => (object)[
+                        'type' => ['array', 'object']
+                    ],
+                    'id' => (object)[
+                        'type' => ['integer', 'string']
+                    ],
+                ]
+            ];
+        }
     }
 
     public static function fromString(string $raw): Input
@@ -88,10 +85,6 @@ JSON;
 
     public function isRpcRequest(): bool
     {
-        if (!self::$schema instanceof stdClass) {
-            self::$schema = \json_decode(self::INPUT_SCHEMA);
-        }
-
         return Validator::validate(self::$schema, $this->data);
     }
 }
