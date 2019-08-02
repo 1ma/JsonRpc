@@ -16,7 +16,8 @@
         "uma/dic": "^1.0"
     },
     "suggest": {
-        "ext-pcntl": "Needed to use the ConcurrentServer"
+        "ext-pcntl": "Needed to use the ConcurrentServer",
+        "ext-simdjson": "Allows for faster JSON decoding"
     },
     "autoload": {
         "psr-4": {
