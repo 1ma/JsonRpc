@@ -12,7 +12,6 @@
     "require-dev": {
         "phpmetrics/phpmetrics": "^2.4",
         "phpunit/phpunit": "^7.0",
-        "roave/security-advisories": "dev-master",
         "uma/dic": "^1.0"
     },
     "suggest": {
