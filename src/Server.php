@@ -8,6 +8,7 @@ use LogicException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use stdClass;
 use TypeError;
 use UMA\JsonRpc\Internal\Assert;
 use UMA\JsonRpc\Internal\Input;
@@ -128,7 +129,7 @@ class Server
             return self::end(Error::internal($request->id()), $request);
         }
 
-        if (!Validator::validate($procedure->getSpec(), $request->params())) {
+        if ($procedure->getSpec() instanceof stdClass && !Validator::validate($procedure->getSpec(), $request->params())) {
             return self::end(Error::invalidParams($request->id()), $request);
         }
 
