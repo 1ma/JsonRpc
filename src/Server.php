@@ -35,7 +35,7 @@ class Server
     /**
      * @var int|null
      */
-    protected $batchLimit;
+    private $batchLimit;
 
     public function __construct(ContainerInterface $container, int $batchLimit = null)
     {
