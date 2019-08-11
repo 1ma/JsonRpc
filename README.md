@@ -179,11 +179,24 @@ $response = $server->run('{"jsonrpc":"2.0","method":"add","params":[2,3],"id":1}
 
 ## Json Parsing
 
-The library will try to decode Json payloads using the [simdjson PHP bindings] if they are available. When not
-available the builtin `json_decode()` function will be used instead.
+The library can use the [simdjson PHP bindings] to decode Json payloads if they are available.
 
 These bindings integrate a [C++ Json decoder] written by Daniel Lemire into PHP. In the synthetic benchmarks bundled
 with the extension it shows speedups ranging between 1.4x and 2x compared to `json_decode()`.
+
+In order to use them you need to build and load the `simdjson` extension _and_ pass `true` as the optional third
+parameter of the JsonRpc Server when you instantiate it. This extra step was added due to the fact that `simdjson`
+relies on the `AVX2` and/or `SSE4.2` instruction sets to work, so you should check that you have either one of them
+before switching to this parsing method.
+
+On a Linux OS you can find out this information by peeking at the `/proc/cpuinfo` pseudofile:
+
+```bash
+$ grep avx2 /proc/cpuinfo
+$ grep sse4_2 /proc/cpuinfo
+```
+
+If none of the above commands output anything you won't be able use `simdjson`.
 
 
 ## Concurrent Server
