@@ -37,9 +37,15 @@ class Server
      */
     private $batchLimit;
 
-    public function __construct(ContainerInterface $container, int $batchLimit = null)
+    /**
+     * @var bool
+     */
+    private $simdJson;
+
+    public function __construct(ContainerInterface $container, int $batchLimit = null, bool $simdJson = false)
     {
         $this->container = $container;
+        $this->simdJson = $simdJson;
         $this->batchLimit = $batchLimit;
         $this->methods = [];
         $this->middlewares = [];
@@ -72,7 +78,7 @@ class Server
      */
     public function run(string $raw): ?string
     {
-        $input = Input::fromString($raw);
+        $input = Input::fromString($raw, $this->simdJson);
 
         if (!$input->parsable()) {
             return self::end(Error::parsing());

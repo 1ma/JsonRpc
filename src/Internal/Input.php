@@ -56,9 +56,9 @@ final class Input
         }
     }
 
-    public static function fromString(string $raw): Input
+    public static function fromString(string $raw, bool $simdJson): Input
     {
-        if (!\extension_loaded('simdjson')) {
+        if (!$simdJson || !\extension_loaded('simdjson')) {
             return new self(\json_decode($raw), \json_last_error());
         }
 

@@ -14,7 +14,7 @@ final class InputTest extends TestCase
      */
     public function testValidInputs(string $raw): void
     {
-        $sut = Input::fromString($raw);
+        $sut = Input::fromString($raw, false);
 
         self::assertTrue($sut->parsable());
         self::assertEquals($sut->data(), \json_decode($raw));
@@ -36,7 +36,18 @@ final class InputTest extends TestCase
      */
     public function testInputParseError(string $raw): void
     {
-        $sut = Input::fromString($raw);
+        $sut = Input::fromString($raw, false);
+
+        self::assertFalse($sut->parsable());
+        self::assertNull($sut->data());
+
+        self::assertFalse($sut->isArray());
+
+        if (!self::simdJsonSupport()) {
+            return;
+        }
+
+        $sut = Input::fromString($raw, true);
 
         self::assertFalse($sut->parsable());
         self::assertNull($sut->data());
@@ -49,7 +60,7 @@ final class InputTest extends TestCase
         return [
             [''],
             ['}"jsonrpc":"2.0'],
-            [random_bytes(6)]
+            [\random_bytes(6)]
         ];
     }
 
@@ -58,12 +69,24 @@ final class InputTest extends TestCase
      */
     public function testInvalidInputs(string $raw): void
     {
-        $sut = Input::fromString($raw);
+        $sut = Input::fromString($raw, false);
 
         self::assertTrue($sut->parsable());
         self::assertEquals($sut->data(), \json_decode($raw));
 
         self::assertFalse($sut->isArray());
+
+        if (!self::simdJsonSupport()) {
+            return;
+        }
+
+        $sut = Input::fromString($raw, true);
+
+        self::assertTrue($sut->parsable());
+        self::assertEquals($sut->data(), \json_decode($raw));
+
+        self::assertFalse($sut->isArray());
+
     }
 
     public function invalidInputsProvider(): array
@@ -77,5 +100,17 @@ final class InputTest extends TestCase
             'empty string' => ['""'],
             'empty array' => ['[]']
         ];
+    }
+
+    /**
+     * Return whether the PHP installation on which the tests are running has the
+     * simdjson extension loaded, is running on Linux and the machine has either
+     * the AVX2 or SSE4.2 instruction sets.
+     */
+    private static function simdJsonSupport(): bool
+    {
+        return \extension_loaded('simdjson')
+            && 'Linux' === PHP_OS
+            && (null !== \shell_exec('grep avx2 /proc/cpuinfo') || null !== \shell_exec('grep sse4_2 /proc/cpuinfo'));
     }
 }
