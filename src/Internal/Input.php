@@ -39,7 +39,6 @@ final class Input
                 'additionalProperties' => false,
                 'properties' => (object)[
                     'jsonrpc' => (object)[
-                        'type' => 'string',
                         'enum' => ['2.0']
                     ],
                     'method' => (object)[
