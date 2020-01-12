@@ -20,27 +20,27 @@ class Server
     /**
      * @var ContainerInterface
      */
-    private $container;
+    protected $container;
 
     /**
      * @var string[]
      */
-    private $methods;
+    protected $methods;
 
     /**
      * @var string[]
      */
-    private $middlewares;
+    protected $middlewares;
 
     /**
      * @var int|null
      */
-    private $batchLimit;
+    protected $batchLimit;
 
     /**
      * @var bool
      */
-    private $simdJson;
+    protected $simdJson;
 
     public function __construct(ContainerInterface $container, int $batchLimit = null, bool $simdJson = false)
     {
