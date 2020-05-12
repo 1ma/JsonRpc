@@ -28,7 +28,7 @@ final class ConcurrentServer extends Server
             if (0 === $pid) {
                 \fclose($pair[0]);
 
-                \fwrite($pair[1], $this->single(Input::fromSafeData($request)) . "\n");
+                \fwrite($pair[1], $this->single(Input::fromSafeData($request)) . '');
 
                 \fclose($pair[1]);
 
@@ -43,7 +43,7 @@ final class ConcurrentServer extends Server
         while (-1 !== $pid = \pcntl_wait($status)) {
             $socket = $children[$pid];
 
-            if ('' !== $response = \trim(\fgets($socket))) {
+            if ('' !== $response = \stream_get_contents($socket)) {
                 $responses[] = $response;
             }
 
