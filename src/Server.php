@@ -81,12 +81,12 @@ class Server
         $input = Input::fromString($raw, $this->simdJson);
 
         if (!$input->parsable()) {
-            return self::end(Error::parsing());
+            return static::end(Error::parsing());
         }
 
         if ($input->isArray()) {
             if ($this->tooManyBatchRequests($input)) {
-                return self::end(Error::tooManyBatchRequests($this->batchLimit));
+                return static::end(Error::tooManyBatchRequests($this->batchLimit));
             }
 
             return $this->batch($input);
@@ -118,13 +118,13 @@ class Server
     protected function single(Input $input): ?string
     {
         if (!$input->isRpcRequest()) {
-            return self::end(Error::invalidRequest());
+            return static::end(Error::invalidRequest());
         }
 
         $request = new Request($input);
 
         if (!\array_key_exists($request->method(), $this->methods)) {
-            return self::end(Error::unknownMethod($request->id()), $request);
+            return static::end(Error::unknownMethod($request->id()), $request);
         }
 
         try {
@@ -132,11 +132,11 @@ class Server
                 $this->container->get($this->methods[$request->method()])
             );
         } catch (ContainerExceptionInterface | NotFoundExceptionInterface $e) {
-            return self::end(Error::internal($request->id()), $request);
+            return static::end(Error::internal($request->id()), $request);
         }
 
         if ($procedure->getSpec() instanceof stdClass && !Validator::validate($procedure->getSpec(), $request->params())) {
-            return self::end(Error::invalidParams($request->id()), $request);
+            return static::end(Error::invalidParams($request->id()), $request);
         }
 
         $stack = MiddlewareStack::compose(
@@ -146,7 +146,7 @@ class Server
             }, \array_keys($this->middlewares))
         );
 
-        return self::end($stack($request), $request);
+        return static::end($stack($request), $request);
     }
 
     protected function tooManyBatchRequests(Input $input): bool
