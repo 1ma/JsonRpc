@@ -22,7 +22,7 @@ final class MiddlewaresTest extends TestCase
      */
     private $middleware;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->middleware = new LoggingMiddleware();
 

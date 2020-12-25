@@ -55,17 +55,9 @@ final class Input
         }
     }
 
-    public static function fromString(string $raw, bool $simdJson): Input
+    public static function fromString(string $raw): Input
     {
-        if (!$simdJson || !\extension_loaded('simdjson')) {
-            return new self(\json_decode($raw), \json_last_error());
-        }
-
-        if (!\simdjson_isvalid($raw)) {
-            return new self(null, JSON_ERROR_SYNTAX);
-        }
-
-        return new self(\simdjson_decode($raw), JSON_ERROR_NONE);
+        return new self(\json_decode($raw), \json_last_error());
     }
 
     public static function fromSafeData($data): Input

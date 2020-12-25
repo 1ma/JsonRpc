@@ -17,11 +17,11 @@ build:
                     - php-scrutinizer-run --enable-security-analysis
         testing:
             environment:
-                php: '7.1'
+                php: '7.3'
             tests:
                 override:
                     -
                         command: composer test
                         coverage:
-                            file: build/phpunit/clover.xml
+                            file: build/coverage.xml
                             format: php-clover

@@ -1,6 +1,6 @@
 # JsonRpc
 
-[![Build Status](https://travis-ci.org/1ma/JsonRpc.svg?branch=master)](https://travis-ci.org/1ma/JsonRpc) [![Code Coverage](https://scrutinizer-ci.com/g/1ma/JsonRpc/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/1ma/JsonRpc/?branch=master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/1ma/JsonRpc/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/1ma/JsonRpc/?branch=master)
+![.github/workflows/phpunit.yml](https://github.com/1ma/JsonRpc/workflows/.github/workflows/phpunit.yml/badge.svg) [![Code Coverage](https://scrutinizer-ci.com/g/1ma/JsonRpc/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/1ma/JsonRpc/?branch=master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/1ma/JsonRpc/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/1ma/JsonRpc/?branch=master)
 
 A modern, object-oriented [JSON-RPC 2.0] server for PHP 7.1 featuring JSON Schema integration and middlewaring.
 
@@ -179,24 +179,9 @@ $response = $server->run('{"jsonrpc":"2.0","method":"add","params":[2,3],"id":1}
 
 ## Json Parsing
 
-The library can use the [simdjson PHP bindings] to decode Json payloads if they are available.
+~~The library can use the [simdjson PHP bindings] to decode Json payloads if they are available.~~
 
-These bindings integrate a [C++ Json decoder] written by Daniel Lemire into PHP. In the synthetic benchmarks bundled
-with the extension it shows speedups ranging between 1.4x and 2x compared to `json_decode()`.
-
-In order to use them you need to build and load the `simdjson` extension _and_ pass `true` as the optional third
-parameter of the JsonRpc Server when you instantiate it. This extra step was added due to the fact that `simdjson`
-relies on the `AVX2` and/or `SSE4.2` instruction sets to work, so you should check that you have either one of them
-before switching to this parsing method.
-
-On a Linux OS you can find out this information by peeking at the `/proc/cpuinfo` pseudofile:
-
-```bash
-$ grep avx2 /proc/cpuinfo
-$ grep sse4_2 /proc/cpuinfo
-```
-
-If none of the above commands output anything you won't be able use `simdjson`.
+simdjson support was dropped on version 3.0.0 due to poor binding maintenance.
 
 
 ## Concurrent Server
@@ -439,7 +424,6 @@ $response = $server->run('[
 
 [JSON-RPC 2.0]: http://www.jsonrpc.org/specification
 [simdjson PHP bindings]: https://github.com/crazyxman/simdjson_php
-[C++ Json decoder]: https://github.com/lemire/simdjson
 [PCNTL extension]: http://php.net/manual/en/intro.pcntl.php
 [Slim framework documentation]: https://www.slimframework.com/docs/
 [avian carriers]: https://tools.ietf.org/html/rfc1149

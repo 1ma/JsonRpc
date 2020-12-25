@@ -1,3 +1,10 @@
+### [3.0.0] - 2020-12-24
+
+* (Breaking Change) Raised minimum required version to PHP 7.3 and started to test lib for PHP 7.3, 7.4 and 8.0
+* (Breaking Change) Dropped simdjson decoding support.
+* (Improvement) Updated development dependencies
+* (Improvement) Decommissioned Travis CI in favor of Github Actions
+
 ### [2.1.3] - 2020-08-24
 
   * (Improvement) [use static instead of self for late static bindings in Server](https://github.com/1ma/JsonRpc/pull/7)
@@ -38,6 +45,7 @@
 
   * Initial pre-release
 
+[3.0.0]: https://github.com/1ma/JsonRpc/compare/v2.1.3...v3.0.0
 [2.1.3]: https://github.com/1ma/JsonRpc/compare/v2.1.2...v2.1.3
 [2.1.2]: https://github.com/1ma/JsonRpc/compare/v2.1.1...v2.1.2
 [2.1.1]: https://github.com/1ma/JsonRpc/compare/v2.1.0...v2.1.1

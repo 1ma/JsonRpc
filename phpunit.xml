@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.5/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+         beStrictAboutOutputDuringTests="true"
+         beStrictAboutTodoAnnotatedTests="true"
+         cacheResult="false"
+         executionOrder="depends,defects"
+         failOnRisky="true"
+         failOnWarning="true"
+         testdox="true"
+         verbose="true"
+>
+    <testsuites>
+        <testsuite name="uma/json-rpc test suite">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+
+    <coverage processUncoveredFiles="true">
+        <include>
+            <directory suffix=".php">src</directory>
+        </include>
+        <report>
+            <clover outputFile="build/coverage.xml"/>
+            <html outputDirectory="build/coverage"/>
+            <text outputFile="php://stdout" showOnlySummary="true"/>
+        </report>
+    </coverage>
+
+    <logging>
+        <junit outputFile="build/junit.xml"/>
+    </logging>
+</phpunit>

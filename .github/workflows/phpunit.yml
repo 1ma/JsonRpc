@@ -1,0 +1,35 @@
+on: push
+
+jobs:
+  php73:
+    runs-on: ubuntu-latest
+    container: 1maa/php-dev:7.3
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Run tests in PHP 7.3
+        run: |
+          composer install
+          composer test
+
+  php74:
+    runs-on: ubuntu-latest
+    container: 1maa/php-dev:7.4
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Run tests in PHP 7.4
+        run: |
+          composer install
+          composer test
+
+  php80:
+    runs-on: ubuntu-latest
+    container: 1maa/php-dev:8.0
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Run tests in PHP 8.0
+        run: |
+          composer install
+          composer test

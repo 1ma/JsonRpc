@@ -26,7 +26,7 @@ final class ServerTest extends TestCase
      */
     private $sut;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = new Container;
         $this->sut = new Server($this->container);

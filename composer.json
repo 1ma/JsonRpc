@@ -4,19 +4,18 @@
     "license": "MIT",
     "type": "library",
     "require": {
-        "php": ">=7.1",
+        "php": "^7.3.0 || ^7.4.0 || ^8.0.0",
         "ext-json": "*",
         "opis/json-schema": "^1.0",
         "psr/container": "^1.0"
     },
     "require-dev": {
-        "phpmetrics/phpmetrics": "^2.6",
-        "phpunit/phpunit": "^7.5",
-        "uma/dic": "^1.0"
+        "phpmetrics/phpmetrics": "^2.7",
+        "phpunit/phpunit": "^9.5",
+        "uma/dic": "^2.0"
     },
     "suggest": {
-        "ext-pcntl": "Needed to use the ConcurrentServer",
-        "ext-simdjson": "Allows for faster JSON decoding"
+        "ext-pcntl": "Needed to use the ConcurrentServer"
     },
     "autoload": {
         "psr-4": {
@@ -29,10 +28,10 @@
         }
     },
     "scripts": {
-        "test": "php -dzend.assertions=1 -dassert.exception=1 vendor/bin/phpunit --testdox",
+        "test": "php -dzend.assertions=1 -dassert.exception=1 vendor/bin/phpunit",
         "metrics": [
             "@test",
-            "vendor/bin/phpmetrics --junit=./build/phpunit/junit.xml --report-html=./build/phpmetrics ."
+            "vendor/bin/phpmetrics --junit=./build/junit.xml --report-html=./build/metrics ."
         ]
     },
     "config": {
