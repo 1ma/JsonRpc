@@ -15,27 +15,27 @@ use UMA\JsonRpc\Internal\Input;
 use UMA\JsonRpc\Internal\MiddlewareStack;
 use UMA\JsonRpc\Internal\Validator;
 
-class Server
+final class Server
 {
     /**
      * @var ContainerInterface
      */
-    protected $container;
+    private $container;
 
     /**
      * @var string[]
      */
-    protected $methods;
+    private $methods;
 
     /**
      * @var string[]
      */
-    protected $middlewares;
+    private $middlewares;
 
     /**
      * @var int|null
      */
-    protected $batchLimit;
+    private $batchLimit;
 
     public function __construct(ContainerInterface $container, int $batchLimit = null)
     {
@@ -89,7 +89,7 @@ class Server
         return $this->single($input);
     }
 
-    protected function batch(Input $input): ?string
+    private function batch(Input $input): ?string
     {
         \assert($input->isArray());
 
@@ -109,7 +109,7 @@ class Server
     /**
      * @throws TypeError
      */
-    protected function single(Input $input): ?string
+    private function single(Input $input): ?string
     {
         if (!$input->isRpcRequest()) {
             return static::end(Error::invalidRequest());
@@ -143,14 +143,14 @@ class Server
         return static::end($stack($request), $request);
     }
 
-    protected function tooManyBatchRequests(Input $input): bool
+    private function tooManyBatchRequests(Input $input): bool
     {
         \assert($input->isArray());
 
         return \is_int($this->batchLimit) && $this->batchLimit < \count($input->data());
     }
 
-    protected static function end(Response $response, Request $request = null): ?string
+    private static function end(Response $response, Request $request = null): ?string
     {
         return $request instanceof Request && null === $request->id() ?
             null : \json_encode($response);

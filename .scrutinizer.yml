@@ -3,25 +3,12 @@ filter:
         - 'tests/'
     dependency_paths:
         - 'vendor/'
+
 checks:
     php: true
+
 coding_style:
     php: {  }
-build:
-    nodes:
-        analysis:
-            project_setup:
-                override: true
-            tests:
-                override:
-                    - php-scrutinizer-run --enable-security-analysis
-        testing:
-            environment:
-                php: '7.3'
-            tests:
-                override:
-                    -
-                        command: composer test
-                        coverage:
-                            file: build/coverage.xml
-                            format: php-clover
+
+tools:
+    external_code_coverage: true

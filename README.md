@@ -1,6 +1,7 @@
 # JsonRpc
 
-![.github/workflows/phpunit.yml](https://github.com/1ma/JsonRpc/workflows/.github/workflows/phpunit.yml/badge.svg) [![Code Coverage](https://scrutinizer-ci.com/g/1ma/JsonRpc/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/1ma/JsonRpc/?branch=master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/1ma/JsonRpc/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/1ma/JsonRpc/?branch=master)
+[![Build Status](https://github.com/1ma/JsonRpc/workflows/.github/workflows/phpunit.yml/badge.svg)](https://github.com/1ma/JsonRpc/actions)
+[![Code Coverage](https://scrutinizer-ci.com/g/1ma/JsonRpc/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/1ma/JsonRpc/?branch=master)
 
 A modern, object-oriented [JSON-RPC 2.0] server for PHP 7.1 featuring JSON Schema integration and middlewaring.
 

@@ -12,6 +12,7 @@
     "require-dev": {
         "phpmetrics/phpmetrics": "^2.7",
         "phpunit/phpunit": "^9.5",
+        "scrutinizer/ocular": "^1.8",
         "uma/dic": "^2.0"
     },
     "suggest": {
