@@ -185,14 +185,13 @@ This allows you to use custom Opis [filters], [formats] and [media types].
 To do that simply define an `Opis\JsonSchema\Validator::class` service in the PSR-11 container
 and set it to a custom instance of the Validator class.
 
-The following example defines a new "prime" format for integers that you can then use in your json schemas:
+The following example defines a new "prime" format for integers that you can then use in your json schemas.
+(PrimeNumberFormat implementation is omitted for brevity):
 
 ```php
-$formatsContainer = new Opis\JsonSchema\FormatContainer();
-$formatsContainer->add('integer', 'prime', new PrimeNumberFormat());
-
 $validator = new Opis\JsonSchema\Validator();
-$validator->setFormats($extraFormats);
+$formats = $validator->parser()->getFormatResolver();
+$formats->register('integer', 'prime', new PrimeNumberFormat());
 
 $psr11Container->set(Opis\JsonSchema\Validator::class, $validator);
 $jsonServer = new Server($psr11Container);
@@ -429,9 +428,9 @@ $response = $server->run('[
 
 
 [JSON-RPC 2.0]: http://www.jsonrpc.org/specification
-[filters]: https://opis.io/json-schema/1.x/filters.html
-[formats]: https://opis.io/json-schema/1.x/php-format.html
-[media types]: https://opis.io/json-schema/1.x/php-media-type.html
+[filters]: https://opis.io/json-schema/2.x/php-filter.html
+[formats]: https://opis.io/json-schema/2.x/php-format.html
+[media types]: https://opis.io/json-schema/2.x/php-media-type.html
 [Slim framework documentation]: https://www.slimframework.com/docs/
 [avian carriers]: https://tools.ietf.org/html/rfc1149
 [Understanding JSON Schema]: https://spacetelescope.github.io/understanding-json-schema
