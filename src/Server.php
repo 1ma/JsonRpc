@@ -166,7 +166,7 @@ final class Server
     {
         \assert($input->isArray());
 
-        return \is_int($this->batchLimit) && $this->batchLimit < count($input->data());
+        return \is_int($this->batchLimit) && $this->batchLimit < \count($input->data());
     }
 
     private static function end(Response $response, Request $request = null): ?string
