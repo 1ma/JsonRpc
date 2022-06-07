@@ -4,7 +4,7 @@ jobs:
   test:
     name: Run tests in PHP ${{ matrix.php-version }}
     runs-on: ubuntu-latest
-    container: FTI-Herbert/php-dev:${{ matrix.php-version }}
+    container: 1maa/php-dev:${{ matrix.php-version }}
     strategy:
       fail-fast: false
       matrix:
@@ -16,6 +16,3 @@ jobs:
         run: composer install
       - name: Execute test suite
         run: composer test
-      - name: Send coverage to Scrutinizer CI
-        if: ${{ always() && matrix.php-version == '8.1' }}
-        run: php vendor/bin/ocular code-coverage:upload --format=php-clover build/coverage.xml
