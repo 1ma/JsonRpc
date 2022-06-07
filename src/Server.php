@@ -141,7 +141,7 @@ final class Server
             }, \array_keys($this->middlewares))
         );
 
-        return self::end($stack($request), $request);
+        return static::end($stack($request), $request);
     }
 
     /**
