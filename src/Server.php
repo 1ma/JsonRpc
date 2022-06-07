@@ -76,12 +76,12 @@ final class Server
         $input = Input::fromString($raw);
 
         if (!$input->parsable()) {
-            return self::end(Error::parsing());
+            return static::end(Error::parsing());
         }
 
         if ($input->isArray()) {
             if ($this->tooManyBatchRequests($input)) {
-                return self::end(Error::tooManyBatchRequests($this->batchLimit));
+                return static::end(Error::tooManyBatchRequests($this->batchLimit));
             }
 
             return $this->batch($input);
@@ -113,13 +113,13 @@ final class Server
     private function single(Input $input): ?string
     {
         if (!$input->isRpcRequest()) {
-            return self::end(Error::invalidRequest());
+            return static::end(Error::invalidRequest());
         }
 
         $request = new Request($input);
 
-        if (!array_key_exists($request->method(), $this->methods)) {
-            return self::end(Error::unknownMethod($request->id()), $request);
+        if (!\array_key_exists($request->method(), $this->methods)) {
+            return static::end(Error::unknownMethod($request->id()), $request);
         }
 
         try {
@@ -141,7 +141,7 @@ final class Server
             }, \array_keys($this->middlewares))
         );
 
-        return static::end($stack($request), $request);
+        return self::end($stack($request), $request);
     }
 
     /**
@@ -166,12 +166,12 @@ final class Server
     {
         \assert($input->isArray());
 
-        return \is_int($this->batchLimit) && $this->batchLimit < \count($input->data());
+        return is_int($this->batchLimit) && $this->batchLimit < count($input->data());
     }
 
     private static function end(Response $response, Request $request = null): ?string
     {
         return $request instanceof Request && null === $request->id() ?
-            null : \json_encode($response);
+            null : json_encode($response);
     }
 }
