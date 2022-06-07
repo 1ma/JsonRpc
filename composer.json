@@ -4,7 +4,7 @@
     "license": "MIT",
     "type": "library",
     "require": {
-        "php": "^7.3.0 || ^7.4.0 || ^8.0.0",
+        "php": "~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0",
         "ext-json": "*",
         "opis/json-schema": "^1.0",
         "psr/container": "^1.0"
