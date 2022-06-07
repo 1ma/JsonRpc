@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace UMA\JsonRpc;
 
 use LogicException;
+use Opis\JsonSchema\Validator as OpisValidator;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -129,7 +130,7 @@ final class Server
             return static::end(Error::internal($request->id()), $request);
         }
 
-        if ($procedure->getSpec() instanceof stdClass && !Validator::validate($procedure->getSpec(), $request->params())) {
+        if ($procedure->getSpec() instanceof stdClass && !$this->validate($procedure->getSpec(), $request->params())) {
             return static::end(Error::invalidParams($request->id()), $request);
         }
 
@@ -141,6 +142,24 @@ final class Server
         );
 
         return static::end($stack($request), $request);
+    }
+
+    /**
+     * @param stdClass|null $schema The schema to check against the given data.
+     * @param mixed $data The data to validate (MUST be decoded JSON data).
+     *
+     * @return bool Whether $data conforms to $schema or not
+     */
+    private function validate(stdClass $schema, $data):bool
+    {
+        if (!$this->container->has(OpisValidator::class)) {
+            return Validator::validate($schema, $data);
+        }
+        try {
+            return $this->container->get(OpisValidator::class)->dataValidation($data, $schema)->isValid();
+        } catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
+            return false;
+        }
     }
 
     private function tooManyBatchRequests(Input $input): bool
