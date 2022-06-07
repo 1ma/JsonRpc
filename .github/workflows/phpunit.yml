@@ -11,11 +11,15 @@ jobs:
         php-version: ["7.3", "7.4", "8.0", "8.1"]
     steps:
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
       - name: Install dependencies
         run: composer install
       - name: Execute test suite
         run: composer test
       - name: Send coverage to Scrutinizer CI
         if: ${{ always() && matrix.php-version == '8.1' }}
-        run: php vendor/bin/ocular code-coverage:upload --format=php-clover build/coverage.xml
+        run: |
+          git config --global --add safe.directory /__w/JsonRpc/JsonRpc
+          php vendor/bin/ocular code-coverage:upload --format=php-clover build/coverage.xml
