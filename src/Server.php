@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace UMA\JsonRpc;
 
 use LogicException;
+use Opis\JsonSchema\Validator as OpisValidator;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -75,12 +76,12 @@ final class Server
         $input = Input::fromString($raw);
 
         if (!$input->parsable()) {
-            return static::end(Error::parsing());
+            return self::end(Error::parsing());
         }
 
         if ($input->isArray()) {
             if ($this->tooManyBatchRequests($input)) {
-                return static::end(Error::tooManyBatchRequests($this->batchLimit));
+                return self::end(Error::tooManyBatchRequests($this->batchLimit));
             }
 
             return $this->batch($input);
@@ -112,13 +113,13 @@ final class Server
     private function single(Input $input): ?string
     {
         if (!$input->isRpcRequest()) {
-            return static::end(Error::invalidRequest());
+            return self::end(Error::invalidRequest());
         }
 
         $request = new Request($input);
 
-        if (!\array_key_exists($request->method(), $this->methods)) {
-            return static::end(Error::unknownMethod($request->id()), $request);
+        if (!array_key_exists($request->method(), $this->methods)) {
+            return self::end(Error::unknownMethod($request->id()), $request);
         }
 
         try {
@@ -129,7 +130,7 @@ final class Server
             return static::end(Error::internal($request->id()), $request);
         }
 
-        if ($procedure->getSpec() instanceof stdClass && !Validator::validate($procedure->getSpec(), $request->params())) {
+        if ($procedure->getSpec() instanceof stdClass && !$this->validate($procedure->getSpec(), $request->params())) {
             return static::end(Error::invalidParams($request->id()), $request);
         }
 
@@ -141,6 +142,24 @@ final class Server
         );
 
         return static::end($stack($request), $request);
+    }
+
+    /**
+     * @param stdClass|null $schema The schema to check against the given data.
+     * @param mixed $data The data to validate (MUST be decoded JSON data).
+     *
+     * @return bool Whether $data conforms to $schema or not
+     */
+    private function validate(stdClass $schema, $data):bool
+    {
+        if (!$this->container->has(OpisValidator::class)) {
+            return Validator::validate($schema, $data);
+        }
+        try {
+            return $this->container->get(OpisValidator::class)->dataValidation($data, $schema)->isValid();
+        } catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
+            return false;
+        }
     }
 
     private function tooManyBatchRequests(Input $input): bool
