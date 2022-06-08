@@ -1,3 +1,13 @@
+### [4.0.0] - 2022-06-09
+
+* (Breaking Change) Bumped minimum version of PHP to 8.0
+* (Breaking Change) Bumped minimum requirement of psr/container to ^2.0
+* (Breaking Change) Bumped minimum requirement of opis/json-schema to ^2.0
+* (Breaking Change) Removed ConcurrentServer class
+* (Breaking Change) Made Server class final and their attributes private
+* (Improvement) Made it possible to redefine the Validator through a PSR-11 container service, contributed by @FTI-Herbert
+* (Improvement) Added `getMethods()` to the Server class, contributed by @FTI-Herbert
+
 ### [3.0.0] - 2020-12-24
 
 * (Breaking Change) Raised minimum required version to PHP 7.3 and started to test lib for PHP 7.3, 7.4 and 8.0
@@ -45,6 +55,7 @@
 
   * Initial pre-release
 
+[4.0.0]: https://github.com/1ma/JsonRpc/compare/v3.0.0...v4.0.0
 [3.0.0]: https://github.com/1ma/JsonRpc/compare/v2.1.3...v3.0.0
 [2.1.3]: https://github.com/1ma/JsonRpc/compare/v2.1.2...v2.1.3
 [2.1.2]: https://github.com/1ma/JsonRpc/compare/v2.1.1...v2.1.2
