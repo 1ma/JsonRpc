@@ -103,6 +103,16 @@ final class ServerTest extends TestCase
         );
     }
 
+    public function testGetMethods(): void
+    {
+        self::assertEmpty($this->sut->getMethods());
+
+        $this->container->set(Subtractor::class, new Subtractor);
+        $this->sut->set('subtract', Subtractor::class);
+
+        self::assertSame(['subtract' => Subtractor::class], $this->sut->getMethods());
+    }
+
     public function testValidatorExtension(): void
     {
         $validator = new Validator();
