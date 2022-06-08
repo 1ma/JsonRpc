@@ -90,6 +90,14 @@ final class Server
         return $this->single($input);
     }
 
+    /**
+     * @return string[]
+     */
+    public function getMethods(): array
+    {
+        return $this->methods;
+    }
+
     private function batch(Input $input): ?string
     {
         \assert($input->isArray());
