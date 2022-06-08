@@ -91,9 +91,9 @@ final class Server
     }
 
     /**
-     * @return string[]|null
+     * @return string[]
      */
-    public function getMethods(): ?array
+    public function getMethods(): array
     {
         return $this->methods;
     }
