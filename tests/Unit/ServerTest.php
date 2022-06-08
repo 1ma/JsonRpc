@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace UMA\JsonRpc\Tests\Unit;
 
+use Error;
 use LogicException;
+use Opis\JsonSchema\FormatContainer;
+use Opis\JsonSchema\Validator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerExceptionInterface;
@@ -12,6 +15,8 @@ use TypeError;
 use UMA\DIC\Container;
 use UMA\JsonRpc\Server;
 use UMA\JsonRpc\Tests\Fixture\LoggingMiddleware;
+use UMA\JsonRpc\Tests\Fixture\PrimeNumberFormat;
+use UMA\JsonRpc\Tests\Fixture\PrimeNumberProcedure;
 use UMA\JsonRpc\Tests\Fixture\Subtractor;
 
 final class ServerTest extends TestCase
@@ -96,6 +101,46 @@ final class ServerTest extends TestCase
               {"jsonrpc": "2.0", "method": "subtract", "params": [42, 23], "id": 2}
             ]')
         );
+    }
+
+    public function testValidatorExtension(): void
+    {
+        $extraFormats = new FormatContainer();
+        $extraFormats->add('integer', 'prime', new PrimeNumberFormat());
+
+        $validator = new Validator();
+        $validator->setFormats($extraFormats);
+
+        $this->container->set(Validator::class, $validator);
+        $this->container->set(PrimeNumberProcedure::class, new PrimeNumberProcedure);
+        $this->sut->set('primes', PrimeNumberProcedure::class);
+
+        self::assertSame(
+            '{"jsonrpc":"2.0","result":"this is a prime number","id":1}',
+            $this->sut->run('{"jsonrpc": "2.0", "method": "primes", "params": {"number": 3}, "id": 1}')
+        );
+
+        self::assertSame(
+            '{"jsonrpc":"2.0","error":{"code":-32602,"message":"Invalid params"},"id":2}',
+            $this->sut->run('{"jsonrpc": "2.0", "method": "primes", "params": {"number": 4}, "id": 2}')
+        );
+
+        self::assertSame(
+            '{"jsonrpc":"2.0","error":{"code":-32602,"message":"Invalid params"},"id":3}',
+            $this->sut->run('{"jsonrpc": "2.0", "method": "primes", "params": {"number": "what is even that"}, "id": 3}')
+        );
+    }
+
+    public function testExceptionBubblesUpOnValidatorExtensionBadUsage(): void
+    {
+        $this->expectException(Error::class);
+        $this->expectExceptionMessage('Call to a member function dataValidation() on string');
+
+        $this->container->set(Validator::class, 'what is even that');
+        $this->container->set(Subtractor::class, new Subtractor);
+        $this->sut->set('subtract', Subtractor::class);
+
+        $this->sut->run('{"jsonrpc": "2.0", "method": "subtract", "params": ["foo", "bar"], "id": 1}');
     }
 
     public function testPsr11ContainerException(): void

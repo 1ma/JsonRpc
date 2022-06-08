@@ -3,7 +3,7 @@
 [![Build Status](https://github.com/1ma/JsonRpc/workflows/.github/workflows/phpunit.yml/badge.svg)](https://github.com/1ma/JsonRpc/actions)
 [![Code Coverage](https://scrutinizer-ci.com/g/1ma/JsonRpc/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/1ma/JsonRpc/?branch=master)
 
-A modern, object-oriented [JSON-RPC 2.0] server for PHP 7.1 featuring JSON Schema integration and middlewaring.
+A modern, object-oriented [JSON-RPC 2.0] server for PHP 7.3+ featuring JSON Schema integration and middlewaring.
 
 
 # Table of Contents
@@ -13,8 +13,7 @@ A modern, object-oriented [JSON-RPC 2.0] server for PHP 7.1 featuring JSON Schem
 	- [Creating Procedures](#creating-procedures)
 	- [Registering Services](#registering-services)
 	- [Running the Server](#running-the-server)
-- [Json Parsing](#json-parsing)
-- [Concurrent Server](#concurrent-server)
+- [Custom Validation](#custom-validation)
 - [Middlewares](#middlewares)
 	- [Middleware guarantees](#middleware-guarantees)
 	- [Middleware ordering](#middleware-ordering)
@@ -178,22 +177,28 @@ $response = $server->run('{"jsonrpc":"2.0","method":"add","params":[2,3],"id":1}
 ```
 
 
-## Json Parsing
+## Custom Validation
 
-~~The library can use the [simdjson PHP bindings] to decode Json payloads if they are available.~~
+Since version 3.1.0 you can override the Opis Validator through the container.
+This allows you to use custom Opis [filters], [formats] and [media types].
 
-simdjson support was dropped on version 3.0.0 due to poor binding maintenance.
+To do that simply define an `Opis\JsonSchema\Validator::class` service in the PSR-11 container
+and set it to a custom instance of the Validator class.
 
+The following example defines a new "prime" format for integers that you can then use in your json schemas:
 
-## Concurrent Server
+```php
+$formatsContainer = new Opis\JsonSchema\FormatContainer();
+$formatsContainer->add('integer', 'prime', new PrimeNumberFormat());
 
-`UMA\JsonRpc\ConcurrentServer` has the same API as the regular `Server`, but it is an abomination than whenever
-receives a batch request it forks a child process to handle each sub-request, then waits for all them to finish.
+$validator = new Opis\JsonSchema\Validator();
+$validator->setFormats($extraFormats);
 
-This server relies on the [PCNTL extension], therefore it can only be run from the command line on Unix OSes.
+$psr11Container->set(Opis\JsonSchema\Validator::class, $validator);
+$jsonServer = new Server($psr11Container);
 
-It should be considered "experimental", I only wrote it to see if that concept was feasible.
-
+// ...
+```
 
 ## Middlewares
 
@@ -424,8 +429,9 @@ $response = $server->run('[
 
 
 [JSON-RPC 2.0]: http://www.jsonrpc.org/specification
-[simdjson PHP bindings]: https://github.com/crazyxman/simdjson_php
-[PCNTL extension]: http://php.net/manual/en/intro.pcntl.php
+[filters]: https://opis.io/json-schema/1.x/filters.html
+[formats]: https://opis.io/json-schema/1.x/php-format.html
+[media types]: https://opis.io/json-schema/1.x/php-media-type.html
 [Slim framework documentation]: https://www.slimframework.com/docs/
 [avian carriers]: https://tools.ietf.org/html/rfc1149
 [Understanding JSON Schema]: https://spacetelescope.github.io/understanding-json-schema
