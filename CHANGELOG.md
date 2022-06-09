@@ -59,7 +59,7 @@
 
   * Initial pre-release
 
-[4.0.0]: https://github.com/1ma/JsonRpc/compare/v4.0.0...v4.0.1
+[4.0.1]: https://github.com/1ma/JsonRpc/compare/v4.0.0...v4.0.1
 [4.0.0]: https://github.com/1ma/JsonRpc/compare/v3.0.0...v4.0.0
 [3.0.0]: https://github.com/1ma/JsonRpc/compare/v2.1.3...v3.0.0
 [2.1.3]: https://github.com/1ma/JsonRpc/compare/v2.1.2...v2.1.3
