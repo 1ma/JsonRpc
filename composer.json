@@ -7,13 +7,13 @@
         "php": "~8.0.0 || ~8.1.0",
         "ext-json": "*",
         "opis/json-schema": "^2.0",
-        "psr/container": "^2.0"
+        "psr/container": "^1.0"
     },
     "require-dev": {
         "phpmetrics/phpmetrics": "^2.8",
         "phpunit/phpunit": "^9.5",
         "scrutinizer/ocular": "^1.9",
-        "uma/dic": "^3.0"
+        "uma/dic": "^2.0"
     },
     "autoload": {
         "psr-4": {
