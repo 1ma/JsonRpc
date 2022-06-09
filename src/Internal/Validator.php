@@ -20,7 +20,7 @@ final class Validator
         \assert(false !== \json_encode($data));
 
         return (new OpisValidator)
-            ->dataValidation($data, $schema)
+            ->validate($data, $schema)
             ->isValid();
     }
 }

@@ -3,7 +3,7 @@
 [![Build Status](https://github.com/1ma/JsonRpc/workflows/.github/workflows/phpunit.yml/badge.svg)](https://github.com/1ma/JsonRpc/actions)
 [![Code Coverage](https://scrutinizer-ci.com/g/1ma/JsonRpc/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/1ma/JsonRpc/?branch=master)
 
-A modern, object-oriented [JSON-RPC 2.0] server for PHP 7.3+ featuring JSON Schema integration and middlewaring.
+A modern, object-oriented [JSON-RPC 2.0] server for PHP 8.0+ featuring JSON Schema integration and middlewaring.
 
 
 # Table of Contents
@@ -179,23 +179,22 @@ $response = $server->run('{"jsonrpc":"2.0","method":"add","params":[2,3],"id":1}
 
 ## Custom Validation
 
-Since version 3.1.0 you can override the Opis Validator through the container.
+Since version 4.0.0 you can override the Opis Validator through the container.
 This allows you to use custom Opis [filters], [formats] and [media types].
 
 To do that simply define an `Opis\JsonSchema\Validator::class` service in the PSR-11 container
 and set it to a custom instance of the Validator class.
 
-The following example defines a new "prime" format for integers that you can then use in your json schemas:
+The following example defines a new "prime" format for integers that you can then use in your json schemas.
+(PrimeNumberFormat implementation is omitted for brevity):
 
 ```php
-$formatsContainer = new Opis\JsonSchema\FormatContainer();
-$formatsContainer->add('integer', 'prime', new PrimeNumberFormat());
-
 $validator = new Opis\JsonSchema\Validator();
-$validator->setFormats($extraFormats);
+$formats = $validator->parser()->getFormatResolver();
+$formats->register('integer', 'prime', new PrimeNumberFormat());
 
 $psr11Container->set(Opis\JsonSchema\Validator::class, $validator);
-$jsonServer = new Server($psr11Container);
+$jsonServer = new UMA\JsonRpc\Server($psr11Container);
 
 // ...
 ```
@@ -429,9 +428,9 @@ $response = $server->run('[
 
 
 [JSON-RPC 2.0]: http://www.jsonrpc.org/specification
-[filters]: https://opis.io/json-schema/1.x/filters.html
-[formats]: https://opis.io/json-schema/1.x/php-format.html
-[media types]: https://opis.io/json-schema/1.x/php-media-type.html
+[filters]: https://opis.io/json-schema/2.x/php-filter.html
+[formats]: https://opis.io/json-schema/2.x/php-format.html
+[media types]: https://opis.io/json-schema/2.x/php-media-type.html
 [Slim framework documentation]: https://www.slimframework.com/docs/
 [avian carriers]: https://tools.ietf.org/html/rfc1149
 [Understanding JSON Schema]: https://spacetelescope.github.io/understanding-json-schema

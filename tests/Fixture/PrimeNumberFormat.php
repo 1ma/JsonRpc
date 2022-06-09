@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace UMA\JsonRpc\Tests\Fixture;
 
-use Opis\JsonSchema\IFormat;
+use Opis\JsonSchema\Format;
 
-final class PrimeNumberFormat implements IFormat
+final class PrimeNumberFormat implements Format
 {
     public function validate($data): bool
     {

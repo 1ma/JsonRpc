@@ -161,7 +161,7 @@ final class Server
     private function validate(stdClass $schema, $data):bool
     {
         try {
-            return $this->container->get(OpisValidator::class)->dataValidation($data, $schema)->isValid();
+            return $this->container->get(OpisValidator::class)->validate($data, $schema)->isValid();
         } catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
             return Validator::validate($schema, $data);
         }

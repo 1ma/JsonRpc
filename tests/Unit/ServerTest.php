@@ -103,13 +103,21 @@ final class ServerTest extends TestCase
         );
     }
 
+    public function testGetMethods(): void
+    {
+        self::assertEmpty($this->sut->getMethods());
+
+        $this->container->set(Subtractor::class, new Subtractor);
+        $this->sut->set('subtract', Subtractor::class);
+
+        self::assertSame(['subtract' => Subtractor::class], $this->sut->getMethods());
+    }
+
     public function testValidatorExtension(): void
     {
-        $extraFormats = new FormatContainer();
-        $extraFormats->add('integer', 'prime', new PrimeNumberFormat());
-
         $validator = new Validator();
-        $validator->setFormats($extraFormats);
+        $formats = $validator->parser()->getFormatResolver();
+        $formats->register('integer', 'prime', new PrimeNumberFormat());
 
         $this->container->set(Validator::class, $validator);
         $this->container->set(PrimeNumberProcedure::class, new PrimeNumberProcedure);
@@ -134,7 +142,7 @@ final class ServerTest extends TestCase
     public function testExceptionBubblesUpOnValidatorExtensionBadUsage(): void
     {
         $this->expectException(Error::class);
-        $this->expectExceptionMessage('Call to a member function dataValidation() on string');
+        $this->expectExceptionMessage('Call to a member function validate() on string');
 
         $this->container->set(Validator::class, 'what is even that');
         $this->container->set(Subtractor::class, new Subtractor);
