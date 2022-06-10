@@ -50,9 +50,9 @@ final class Error extends Response
         return new static(-32601, 'Method not found', null, $id);
     }
 
-    public static function invalidParams($id): Error
+    public static function invalidParams($id, mixed $data = null): Error
     {
-        return new static(-32602, 'Invalid params', null, $id);
+        return new static(-32602, 'Invalid params', $data, $id);
     }
 
     public static function internal($id): Error

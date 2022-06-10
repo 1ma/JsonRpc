@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace UMA\JsonRpc;
 
 use LogicException;
+use Opis\JsonSchema\Errors\ErrorFormatter;
+use Opis\JsonSchema\ValidationResult;
 use Opis\JsonSchema\Validator as OpisValidator;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
@@ -37,6 +39,11 @@ final class Server
      * @var int|null
      */
     private $batchLimit;
+
+    /**
+     * @var mixed|null
+     */
+    private $error;
 
     public function __construct(ContainerInterface $container, int $batchLimit = null)
     {
@@ -139,7 +146,7 @@ final class Server
         }
 
         if ($procedure->getSpec() instanceof stdClass && !$this->validate($procedure->getSpec(), $request->params())) {
-            return static::end(Error::invalidParams($request->id()), $request);
+            return static::end(Error::invalidParams($request->id(), $this->error), $request);
         }
 
         $stack = MiddlewareStack::compose(
@@ -160,10 +167,21 @@ final class Server
      */
     private function validate(stdClass $schema, $data):bool
     {
-        try {
-            return $this->container->get(OpisValidator::class)->validate($data, $schema)->isValid();
-        } catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
-            return Validator::validate($schema, $data);
+        {
+            $this->error = null;
+            try {
+                /** @var ValidationResult $result */
+                $result = $this->container->get(OpisValidator::class)->validate($data, $schema);
+                if ($result->isValid()) {
+                    return true;
+                }
+                $formatter = new ErrorFormatter();
+                $this->error = $formatter->format($result->error(), true);
+
+                return false;
+            } catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
+                return Validator::validate($schema, $data);
+            }
         }
     }
 
