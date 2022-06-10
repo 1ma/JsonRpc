@@ -32,6 +32,11 @@ final class ErrorTest extends TestCase
         );
 
         self::assertSame(
+            '{"jsonrpc":"2.0","error":{"code":-32602,"message":"Invalid params","data":{"test":"test"}},"id":123}',
+            \json_encode(Error::invalidParams(123, ['test' => 'test']))
+        );
+
+        self::assertSame(
             '{"jsonrpc":"2.0","error":{"code":-32603,"message":"Internal error"},"id":"abc"}',
             \json_encode(Error::internal('abc'))
         );
