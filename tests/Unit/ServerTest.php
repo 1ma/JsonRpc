@@ -81,7 +81,7 @@ final class ServerTest extends TestCase
         $this->sut->set('subtract', Subtractor::class);
 
         self::assertSame(
-            '{"jsonrpc":"2.0","error":{"code":-32602,"message":"Invalid params"},"id":1}',
+            '{"jsonrpc":"2.0","error":{"code":-32602,"message":"Invalid params","data":{"\/0":["The data (string) must match the type: integer"]}},"id":1}',
             $this->sut->run('{"jsonrpc": "2.0", "method": "subtract", "params": ["foo", "bar"], "id": 1}')
         );
     }
