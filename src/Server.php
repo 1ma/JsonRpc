@@ -4,39 +4,35 @@ declare(strict_types=1);
 
 namespace UMA\JsonRpc;
 
+use JsonException;
 use LogicException;
+use Opis\JsonSchema\Errors\ErrorFormatter;
+use Opis\JsonSchema\ValidationResult;
 use Opis\JsonSchema\Validator as OpisValidator;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use stdClass;
-use TypeError;
 use UMA\JsonRpc\Internal\Assert;
 use UMA\JsonRpc\Internal\Input;
 use UMA\JsonRpc\Internal\MiddlewareStack;
-use UMA\JsonRpc\Internal\Validator;
+
+use function array_key_exists;
+use function array_keys;
+use function array_map;
+use function count;
+use function implode;
+use function is_int;
+use function json_encode;
+use function sprintf;
 
 final class Server
 {
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
-
-    /**
-     * @var string[]
-     */
-    private $methods;
-
-    /**
-     * @var string[]
-     */
-    private $middlewares;
-
-    /**
-     * @var int|null
-     */
-    private $batchLimit;
+    private ContainerInterface $container;
+    private array $methods;
+    private array $middlewares;
+    private ?int $batchLimit;
+    private ErrorFormatter $errorFormatter;
 
     public function __construct(ContainerInterface $container, int $batchLimit = null)
     {
@@ -44,6 +40,7 @@ final class Server
         $this->batchLimit = $batchLimit;
         $this->methods = [];
         $this->middlewares = [];
+        $this->errorFormatter = new ErrorFormatter();
     }
 
     public function set(string $method, string $serviceId): Server
@@ -69,19 +66,23 @@ final class Server
     }
 
     /**
-     * @throws TypeError
+     * @param string $raw
+     * @return string|null
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws JsonException
      */
     public function run(string $raw): ?string
     {
         $input = Input::fromString($raw);
 
         if (!$input->parsable()) {
-            return static::end(Error::parsing());
+            return self::end(Error::parsing());
         }
 
         if ($input->isArray()) {
             if ($this->tooManyBatchRequests($input)) {
-                return static::end(Error::tooManyBatchRequests($this->batchLimit));
+                return self::end(Error::tooManyBatchRequests($this->batchLimit));
             }
 
             return $this->batch($input);
@@ -98,6 +99,11 @@ final class Server
         return $this->methods;
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws JsonException
+     */
     private function batch(Input $input): ?string
     {
         \assert($input->isArray());
@@ -112,71 +118,95 @@ final class Server
         }
 
         return empty($responses) ?
-            null : \sprintf('[%s]', \implode(',', $responses));
+            null : sprintf('[%s]', implode(',', $responses));
     }
 
     /**
-     * @throws TypeError
+     * @param Input $input
+     * @return string|null
+     * @throws ContainerExceptionInterface
+     * @throws JsonException
+     * @throws NotFoundExceptionInterface
      */
     private function single(Input $input): ?string
     {
         if (!$input->isRpcRequest()) {
-            return static::end(Error::invalidRequest());
+            return self::end(Error::invalidRequest());
         }
 
         $request = new Request($input);
 
-        if (!\array_key_exists($request->method(), $this->methods)) {
-            return static::end(Error::unknownMethod($request->id()), $request);
+        if (!array_key_exists($request->method(), $this->methods)) {
+            return self::end(Error::unknownMethod($request->id()), $request);
         }
 
         try {
             $procedure = Assert::isProcedure(
                 $this->container->get($this->methods[$request->method()])
             );
-        } catch (ContainerExceptionInterface | NotFoundExceptionInterface $e) {
-            return static::end(Error::internal($request->id()), $request);
+        } catch (ContainerExceptionInterface | NotFoundExceptionInterface) {
+            return self::end(Error::internal($request->id()), $request);
         }
 
-        if ($procedure->getSpec() instanceof stdClass && !$this->validate($procedure->getSpec(), $request->params())) {
-            return static::end(Error::invalidParams($request->id()), $request);
+        if ($procedure->getSpec() instanceof stdClass) {
+            $validatorResult = $this->validate($procedure->getSpec(), $request->params());
+            if (!$validatorResult->isValid()) {
+                return self::end(
+                    Error::invalidParams(
+                        $request->id(),
+                        $this->errorFormatter->format($validatorResult->error())
+                    ),
+                    $request
+                );
+            }
         }
 
         $stack = MiddlewareStack::compose(
             $procedure,
-            ...\array_map(function(string $serviceId) {
+            ...array_map(function(string $serviceId) {
                 return $this->container->get($serviceId);
-            }, \array_keys($this->middlewares))
+            }, array_keys($this->middlewares))
         );
 
-        return static::end($stack($request), $request);
+        return self::end($stack($request), $request);
     }
 
     /**
-     * @param stdClass|null $schema The schema to check against the given data.
+     * @param stdClass $schema The schema to check against the given data.
      * @param mixed $data The data to validate (MUST be decoded JSON data).
      *
-     * @return bool Whether $data conforms to $schema or not
+     * @return ValidationResult Whether $data conforms to $schema or not
      */
-    private function validate(stdClass $schema, $data):bool
+    private function validate(stdClass $schema, mixed $data):ValidationResult
     {
         try {
-            return $this->container->get(OpisValidator::class)->validate($data, $schema)->isValid();
-        } catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
-            return Validator::validate($schema, $data);
+            /** @var ValidationResult $result */
+            return $this->container->get(OpisValidator::class)->validate($data, $schema);
+        } catch (NotFoundExceptionInterface|ContainerExceptionInterface) {
+            return (new OpisValidator)->validate($data, $schema);
         }
     }
 
+    /**
+     * @param Input $input
+     * @return bool
+     */
     private function tooManyBatchRequests(Input $input): bool
     {
         \assert($input->isArray());
 
-        return \is_int($this->batchLimit) && $this->batchLimit < \count($input->data());
+        return is_int($this->batchLimit) && $this->batchLimit < count($input->data());
     }
 
+    /**
+     * @param Response $response
+     * @param Request|null $request
+     * @return string|null
+     * @throws JsonException
+     */
     private static function end(Response $response, Request $request = null): ?string
     {
         return $request instanceof Request && null === $request->id() ?
-            null : \json_encode($response);
+            null : json_encode($response, JSON_THROW_ON_ERROR);
     }
 }

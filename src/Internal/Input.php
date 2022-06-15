@@ -4,25 +4,25 @@ declare(strict_types=1);
 
 namespace UMA\JsonRpc\Internal;
 
+use Opis\JsonSchema\Validator as OpisValidator;
 use stdClass;
+
+use function assert;
+use function is_array;
+use function json_decode;
+use function json_encode;
+use function json_last_error;
 
 final class Input
 {
-    /**
-     * @var stdClass
-     */
-    private static $schema;
+    private static ?stdClass $schema;
+    private mixed $data;
+    private int $error;
 
     /**
-     * @var mixed
+     * @param $data
+     * @param int $error
      */
-    private $data;
-
-    /**
-     * @var int
-     */
-    private $error;
-
     private function __construct($data, int $error)
     {
         $this->data = $data;
@@ -30,60 +30,78 @@ final class Input
 
         // This is the minimal schema that all incoming payloads must
         // conform to in order to be considered well-formed JSON-RPC requests.
-        if (!self::$schema instanceof stdClass) {
-            self::$schema = (object)[
-                '$schema' => 'https://json-schema.org/draft-07/schema#',
-                'description' => 'JSON-RPC 2.0 single request schema',
-                'type' => 'object',
-                'required' => ['jsonrpc', 'method'],
-                'additionalProperties' => false,
-                'properties' => (object)[
-                    'jsonrpc' => (object)[
-                        'enum' => ['2.0']
-                    ],
-                    'method' => (object)[
-                        'type' => 'string'
-                    ],
-                    'params' => (object)[
-                        'type' => ['array', 'object']
-                    ],
-                    'id' => (object)[
-                        'type' => ['integer', 'string']
-                    ],
-                ]
-            ];
-        }
+        self::$schema = (object)[
+            '$schema' => 'https://json-schema.org/draft-07/schema#',
+            'description' => 'JSON-RPC 2.0 single request schema',
+            'type' => 'object',
+            'required' => ['jsonrpc', 'method'],
+            'additionalProperties' => false,
+            'properties' => (object)[
+                'jsonrpc' => (object)[
+                    'enum' => ['2.0']
+                ],
+                'method' => (object)[
+                    'type' => 'string'
+                ],
+                'params' => (object)[
+                    'type' => ['array', 'object']
+                ],
+                'id' => (object)[
+                    'type' => ['integer', 'string']
+                ],
+            ]
+        ];
     }
 
+    /**
+     * @param string $raw
+     * @return Input
+     */
     public static function fromString(string $raw): Input
     {
-        return new self(\json_decode($raw), \json_last_error());
+        return new self(json_decode($raw), json_last_error());
     }
 
+    /**
+     * @param $data
+     * @return Input
+     */
     public static function fromSafeData($data): Input
     {
-        \assert(false !== \json_encode($data));
+        assert(false !== json_encode($data));
 
         return new self($data, JSON_ERROR_NONE);
     }
 
-    public function data()
+    /**
+     * @return mixed
+     */
+    public function data(): mixed
     {
         return $this->data;
     }
 
+    /**
+     * @return bool
+     */
     public function parsable(): bool
     {
         return JSON_ERROR_NONE === $this->error;
     }
 
+    /**
+     * @return bool
+     */
     public function isArray(): bool
     {
-        return \is_array($this->data) && !empty($this->data);
+        return is_array($this->data) && !empty($this->data);
     }
 
+    /**
+     * @return bool
+     */
     public function isRpcRequest(): bool
     {
-        return Validator::validate(self::$schema, $this->data);
+        return (new OpisValidator)->validate($this->data, self::$schema)->isValid();
     }
 }

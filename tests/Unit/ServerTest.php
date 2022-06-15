@@ -6,7 +6,6 @@ namespace UMA\JsonRpc\Tests\Unit;
 
 use Error;
 use LogicException;
-use Opis\JsonSchema\FormatContainer;
 use Opis\JsonSchema\Validator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -82,7 +81,7 @@ final class ServerTest extends TestCase
         $this->sut->set('subtract', Subtractor::class);
 
         self::assertSame(
-            '{"jsonrpc":"2.0","error":{"code":-32602,"message":"Invalid params"},"id":1}',
+            '{"jsonrpc":"2.0","error":{"code":-32602,"message":"Invalid params","data":{"\/0":["The data (string) must match the type: integer"]}},"id":1}',
             $this->sut->run('{"jsonrpc": "2.0", "method": "subtract", "params": ["foo", "bar"], "id": 1}')
         );
     }
@@ -129,12 +128,12 @@ final class ServerTest extends TestCase
         );
 
         self::assertSame(
-            '{"jsonrpc":"2.0","error":{"code":-32602,"message":"Invalid params"},"id":2}',
+            '{"jsonrpc":"2.0","error":{"code":-32602,"message":"Invalid params","data":{"\/number":["The data must match the \'prime\' format"]}},"id":2}',
             $this->sut->run('{"jsonrpc": "2.0", "method": "primes", "params": {"number": 4}, "id": 2}')
         );
 
         self::assertSame(
-            '{"jsonrpc":"2.0","error":{"code":-32602,"message":"Invalid params"},"id":3}',
+            '{"jsonrpc":"2.0","error":{"code":-32602,"message":"Invalid params","data":{"\/number":["The data (string) must match the type: integer"]}},"id":3}',
             $this->sut->run('{"jsonrpc": "2.0", "method": "primes", "params": {"number": "what is even that"}, "id": 3}')
         );
     }
