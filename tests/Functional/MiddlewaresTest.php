@@ -12,15 +12,8 @@ use UMA\JsonRpc\Tests\Fixture\Subtractor;
 
 final class MiddlewaresTest extends TestCase
 {
-    /**
-     * @var Server
-     */
-    private $sut;
-
-    /**
-     * @var LoggingMiddleware
-     */
-    private $middleware;
+    private Server $sut;
+    private LoggingMiddleware $middleware;
 
     protected function setUp(): void
     {

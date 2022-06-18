@@ -10,6 +10,7 @@ use Opis\JsonSchema\Validator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerExceptionInterface;
+use RuntimeException;
 use TypeError;
 use UMA\DIC\Container;
 use UMA\JsonRpc\Server;
@@ -20,15 +21,8 @@ use UMA\JsonRpc\Tests\Fixture\Subtractor;
 
 final class ServerTest extends TestCase
 {
-    /**
-     * @var Container
-     */
-    private $container;
-
-    /**
-     * @var Server
-     */
-    private $sut;
+    private Container $container;
+    private Server $sut;
 
     protected function setUp(): void
     {
@@ -154,13 +148,14 @@ final class ServerTest extends TestCase
     {
         /** @var MockObject|Container $container */
         $container = $this->getMockBuilder(Container::class)
-            ->setMethods(['get'])
+            ->onlyMethods(['get'])
             ->getMock();
 
         $container->expects(self::once())
             ->method('get')
             ->with(Subtractor::class)
-            ->will(self::throwException(new class () extends \RuntimeException implements ContainerExceptionInterface {}));
+            ->will(self::throwException(new class () extends RuntimeException implements ContainerExceptionInterface {
+            }));
 
         $container->set(Subtractor::class, new Subtractor());
 

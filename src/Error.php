@@ -6,28 +6,11 @@ namespace UMA\JsonRpc;
 
 final class Error extends Response
 {
-    /**
-     * @var int
-     */
-    private $code;
+    private int|string|null $code;
+    private string $message;
+    private mixed $data;
 
-    /**
-     * @var string
-     */
-    private $message;
-
-    /**
-     * @var mixed
-     */
-    private $data;
-
-    /**
-     * @param int             $code
-     * @param string          $message
-     * @param mixed           $data
-     * @param int|string|null $id
-     */
-    public function __construct(int $code, string $message, $data = null, $id = null)
+    public function __construct(int $code, string $message, mixed $data = null, int|string|null $id = null)
     {
         $this->code = $code;
         $this->message = $message;
@@ -37,32 +20,32 @@ final class Error extends Response
 
     public static function parsing(): Error
     {
-        return new static(-32700, 'Parse error');
+        return new Error(-32700, 'Parse error');
     }
 
     public static function invalidRequest(): Error
     {
-        return new static(-32600, 'Invalid Request');
+        return new Error(-32600, 'Invalid Request');
     }
 
     public static function unknownMethod($id): Error
     {
-        return new static(-32601, 'Method not found', null, $id);
+        return new Error(-32601, 'Method not found', null, $id);
     }
 
     public static function invalidParams($id, mixed $data = null): Error
     {
-        return new static(-32602, 'Invalid params', $data, $id);
+        return new Error(-32602, 'Invalid params', $data, $id);
     }
 
     public static function internal($id): Error
     {
-        return new static(-32603, 'Internal error', null, $id);
+        return new Error(-32603, 'Internal error', null, $id);
     }
 
     public static function tooManyBatchRequests(int $limit): Error
     {
-        return new static(-32000, 'Too many batch requests sent to server', ['limit' => $limit]);
+        return new Error(-32000, 'Too many batch requests sent to server', ['limit' => $limit]);
     }
 
     public function jsonSerialize(): array

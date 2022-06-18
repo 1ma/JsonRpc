@@ -12,14 +12,14 @@ use Opis\JsonSchema\Validator as OpisValidator;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use stdClass;
 use UMA\JsonRpc\Internal\Assert;
 use UMA\JsonRpc\Internal\Input;
 use UMA\JsonRpc\Internal\MiddlewareStack;
-
+use stdClass;
 use function array_key_exists;
 use function array_keys;
 use function array_map;
+use function assert;
 use function count;
 use function implode;
 use function is_int;
@@ -66,8 +66,6 @@ final class Server
     }
 
     /**
-     * @param string $raw
-     * @return string|null
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      * @throws JsonException
@@ -106,7 +104,7 @@ final class Server
      */
     private function batch(Input $input): ?string
     {
-        \assert($input->isArray());
+        assert($input->isArray());
 
         $responses = [];
         foreach ($input->data() as $request) {
@@ -122,8 +120,6 @@ final class Server
     }
 
     /**
-     * @param Input $input
-     * @return string|null
      * @throws ContainerExceptionInterface
      * @throws JsonException
      * @throws NotFoundExceptionInterface
@@ -163,7 +159,7 @@ final class Server
 
         $stack = MiddlewareStack::compose(
             $procedure,
-            ...array_map(fn (string $serviceId) => $this->container->get($serviceId), array_keys($this->middlewares))
+            ...array_map(fn (string $serviceId): Middleware => $this->container->get($serviceId), array_keys($this->middlewares))
         );
 
         return self::end($stack($request), $request);
@@ -178,28 +174,20 @@ final class Server
     private function validate(stdClass $schema, mixed $data): ValidationResult
     {
         try {
-            /** @var ValidationResult $result */
             return $this->container->get(OpisValidator::class)->validate($data, $schema);
         } catch (NotFoundExceptionInterface|ContainerExceptionInterface) {
             return (new OpisValidator())->validate($data, $schema);
         }
     }
 
-    /**
-     * @param Input $input
-     * @return bool
-     */
     private function tooManyBatchRequests(Input $input): bool
     {
-        \assert($input->isArray());
+        assert($input->isArray());
 
         return is_int($this->batchLimit) && $this->batchLimit < count($input->data());
     }
 
     /**
-     * @param Response $response
-     * @param Request|null $request
-     * @return string|null
      * @throws JsonException
      */
     private static function end(Response $response, Request $request = null): ?string

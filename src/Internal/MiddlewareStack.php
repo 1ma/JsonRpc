@@ -9,15 +9,8 @@ use UMA\JsonRpc;
 
 final class MiddlewareStack implements JsonRpc\Procedure
 {
-    /**
-     * @var JsonRpc\Middleware
-     */
-    private $middleware;
-
-    /**
-     * @var JsonRpc\Procedure
-     */
-    private $next;
+    private JsonRpc\Middleware $middleware;
+    private JsonRpc\Procedure $next;
 
     public static function compose(JsonRpc\Procedure $bottom, JsonRpc\Middleware ...$middlewares): JsonRpc\Procedure
     {

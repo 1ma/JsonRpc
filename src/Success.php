@@ -6,16 +6,9 @@ namespace UMA\JsonRpc;
 
 final class Success extends Response
 {
-    /**
-     * @var mixed|null
-     */
-    private $result;
+    private mixed $result;
 
-    /**
-     * @param int|string|null $id
-     * @param mixed           $result
-     */
-    public function __construct($id, $result = null)
+    public function __construct(int|string|null $id, mixed $result = null)
     {
         $this->id = $id;
         $this->result = $result;

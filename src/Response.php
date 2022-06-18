@@ -6,8 +6,5 @@ namespace UMA\JsonRpc;
 
 abstract class Response implements \JsonSerializable
 {
-    /**
-     * @var int|string|null
-     */
-    protected $id;
+    protected int|string|null $id;
 }
