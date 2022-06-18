@@ -16,6 +16,8 @@ jobs:
           fetch-depth: 2
       - name: Install dependencies
         run: composer install
+      - name: Run Linter
+        run: vendor/bin/php-cs-fixer fix -v --dry-run
       - name: Execute test suite
         run: composer test
       - name: Send coverage to Scrutinizer CI

@@ -32,7 +32,7 @@ final class ServerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->container = new Container;
+        $this->container = new Container();
         $this->sut = new Server($this->container);
     }
 
@@ -65,7 +65,7 @@ final class ServerTest extends TestCase
     {
         $this->expectException(TypeError::class);
 
-        $this->container->set(Subtractor::class, new Subtractor);
+        $this->container->set(Subtractor::class, new Subtractor());
         $this->container->set(LoggingMiddleware::class, 'This is not a Middleware!');
 
         $this->sut->set('subtract', Subtractor::class);
@@ -76,7 +76,7 @@ final class ServerTest extends TestCase
 
     public function testInvalidParams(): void
     {
-        $this->container->set(Subtractor::class, new Subtractor);
+        $this->container->set(Subtractor::class, new Subtractor());
 
         $this->sut->set('subtract', Subtractor::class);
 
@@ -88,7 +88,7 @@ final class ServerTest extends TestCase
 
     public function testTooManyBatchRequestsSent(): void
     {
-        $this->container->set(Subtractor::class, new Subtractor);
+        $this->container->set(Subtractor::class, new Subtractor());
 
         $limitedServer = new Server($this->container, 1);
         $limitedServer->set('subtract', Subtractor::class);
@@ -106,7 +106,7 @@ final class ServerTest extends TestCase
     {
         self::assertEmpty($this->sut->getMethods());
 
-        $this->container->set(Subtractor::class, new Subtractor);
+        $this->container->set(Subtractor::class, new Subtractor());
         $this->sut->set('subtract', Subtractor::class);
 
         self::assertSame(['subtract' => Subtractor::class], $this->sut->getMethods());
@@ -119,7 +119,7 @@ final class ServerTest extends TestCase
         $formats->register('integer', 'prime', new PrimeNumberFormat());
 
         $this->container->set(Validator::class, $validator);
-        $this->container->set(PrimeNumberProcedure::class, new PrimeNumberProcedure);
+        $this->container->set(PrimeNumberProcedure::class, new PrimeNumberProcedure());
         $this->sut->set('primes', PrimeNumberProcedure::class);
 
         self::assertSame(
@@ -144,7 +144,7 @@ final class ServerTest extends TestCase
         $this->expectExceptionMessage('Call to a member function validate() on string');
 
         $this->container->set(Validator::class, 'what is even that');
-        $this->container->set(Subtractor::class, new Subtractor);
+        $this->container->set(Subtractor::class, new Subtractor());
         $this->sut->set('subtract', Subtractor::class);
 
         $this->sut->run('{"jsonrpc": "2.0", "method": "subtract", "params": ["foo", "bar"], "id": 1}');
@@ -160,9 +160,9 @@ final class ServerTest extends TestCase
         $container->expects(self::once())
             ->method('get')
             ->with(Subtractor::class)
-            ->will(self::throwException(new class extends \RuntimeException implements ContainerExceptionInterface {}));
+            ->will(self::throwException(new class () extends \RuntimeException implements ContainerExceptionInterface {}));
 
-        $container->set(Subtractor::class, new Subtractor);
+        $container->set(Subtractor::class, new Subtractor());
 
         $sut = new Server($container);
         $sut->set('subtract', Subtractor::class);

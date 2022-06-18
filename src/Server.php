@@ -163,7 +163,7 @@ final class Server
 
         $stack = MiddlewareStack::compose(
             $procedure,
-            ...array_map(function(string $serviceId) {
+            ...array_map(function (string $serviceId) {
                 return $this->container->get($serviceId);
             }, array_keys($this->middlewares))
         );
@@ -177,13 +177,13 @@ final class Server
      *
      * @return ValidationResult Whether $data conforms to $schema or not
      */
-    private function validate(stdClass $schema, mixed $data):ValidationResult
+    private function validate(stdClass $schema, mixed $data): ValidationResult
     {
         try {
             /** @var ValidationResult $result */
             return $this->container->get(OpisValidator::class)->validate($data, $schema);
         } catch (NotFoundExceptionInterface|ContainerExceptionInterface) {
-            return (new OpisValidator)->validate($data, $schema);
+            return (new OpisValidator())->validate($data, $schema);
         }
     }
 

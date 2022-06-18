@@ -102,6 +102,6 @@ final class Input
      */
     public function isRpcRequest(): bool
     {
-        return (new OpisValidator)->validate($this->data, self::$schema)->isValid();
+        return (new OpisValidator())->validate($this->data, self::$schema)->isValid();
     }
 }

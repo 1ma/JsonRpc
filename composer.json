@@ -10,6 +10,7 @@
         "psr/container": "^1.0 || ^2.0"
     },
     "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.8",
         "phpmetrics/phpmetrics": "^2.8",
         "phpunit/phpunit": "^9.5",
         "scrutinizer/ocular": "^1.9",
@@ -26,6 +27,7 @@
         }
     },
     "scripts": {
+        "lint": "vendor/bin/php-cs-fixer fix -v",
         "test": "php -dzend.assertions=1 -dassert.exception=1 vendor/bin/phpunit",
         "metrics": [
             "@test",
