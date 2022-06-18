@@ -27,21 +27,21 @@ final class Subtractor implements JsonRpc\Procedure
     {
         return \json_decode(
             <<<'JSON'
-{
-  "$schema": "https://json-schema.org/draft-07/schema#",
+                {
+                  "$schema": "https://json-schema.org/draft-07/schema#",
 
-  "type": ["array", "object"],
-  "minItems": 2,
-  "maxItems": 2,
-  "items": { "type": "integer" },
-  "required": ["minuend", "subtrahend"],
-  "additionalProperties": false,
-  "properties": {
-    "minuend": { "type": "integer" },
-    "subtrahend": { "type": "integer" }
-  }
-}
-JSON
+                  "type": ["array", "object"],
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "items": { "type": "integer" },
+                  "required": ["minuend", "subtrahend"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "minuend": { "type": "integer" },
+                    "subtrahend": { "type": "integer" }
+                  }
+                }
+                JSON
         );
     }
 }

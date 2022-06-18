@@ -163,9 +163,7 @@ final class Server
 
         $stack = MiddlewareStack::compose(
             $procedure,
-            ...array_map(function (string $serviceId) {
-                return $this->container->get($serviceId);
-            }, array_keys($this->middlewares))
+            ...array_map(fn (string $serviceId) => $this->container->get($serviceId), array_keys($this->middlewares))
         );
 
         return self::end($stack($request), $request);

@@ -26,7 +26,7 @@ final class Success extends Response
         return [
             'jsonrpc' => '2.0',
             'result' => $this->result,
-            'id' => $this->id
+            'id' => $this->id,
         ];
     }
 }

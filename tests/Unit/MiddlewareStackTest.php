@@ -39,7 +39,7 @@ final class MiddlewareStackTest extends TestCase
         self::assertSame([
             'jsonrpc' => '2.0',
             'result' => 6,
-            'id' => '1'
+            'id' => '1',
         ], $response->jsonSerialize());
 
         self::assertNotEmpty($middleware->getSeenResponses());

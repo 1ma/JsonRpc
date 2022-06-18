@@ -71,9 +71,9 @@ final class Error extends Response
             'jsonrpc' => '2.0',
             'error' => [
                 'code' => $this->code,
-                'message' => $this->message
+                'message' => $this->message,
             ],
-            'id' => $this->id
+            'id' => $this->id,
         ];
 
         if (null !== $this->data) {

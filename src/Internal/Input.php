@@ -38,18 +38,18 @@ final class Input
             'additionalProperties' => false,
             'properties' => (object)[
                 'jsonrpc' => (object)[
-                    'enum' => ['2.0']
+                    'enum' => ['2.0'],
                 ],
                 'method' => (object)[
-                    'type' => 'string'
+                    'type' => 'string',
                 ],
                 'params' => (object)[
-                    'type' => ['array', 'object']
+                    'type' => ['array', 'object'],
                 ],
                 'id' => (object)[
-                    'type' => ['integer', 'string']
+                    'type' => ['integer', 'string'],
                 ],
-            ]
+            ],
         ];
     }
 

@@ -28,7 +28,7 @@ final class MiddlewaresTest extends TestCase
 
         $container = new Container([
             Subtractor::class => new Subtractor(),
-            LoggingMiddleware::class => $this->middleware
+            LoggingMiddleware::class => $this->middleware,
         ]);
 
         $this->sut = (new Server($container))
@@ -41,23 +41,23 @@ final class MiddlewaresTest extends TestCase
         $this->sut->run('{"jsonrpc": "2.0", "method": "subtract", "params": [42, 23], "id": 1}');
 
         self::assertSame([
-            '{"jsonrpc":"2.0","method":"subtract","params":[42,23],"id":1}'
+            '{"jsonrpc":"2.0","method":"subtract","params":[42,23],"id":1}',
         ], $this->middleware->getSeenRequests());
 
         self::assertSame([
-            '{"jsonrpc":"2.0","result":19,"id":1}'
+            '{"jsonrpc":"2.0","result":19,"id":1}',
         ], $this->middleware->getSeenResponses());
 
         self::assertNull($this->sut->run('{"jsonrpc": "2.0", "method": "subtract", "params": [42, 23]}'));
 
         self::assertSame([
             '{"jsonrpc":"2.0","method":"subtract","params":[42,23],"id":1}',
-            '{"jsonrpc":"2.0","method":"subtract","params":[42,23]}'
+            '{"jsonrpc":"2.0","method":"subtract","params":[42,23]}',
         ], $this->middleware->getSeenRequests());
 
         self::assertSame([
             '{"jsonrpc":"2.0","result":19,"id":1}',
-            '{"jsonrpc":"2.0","result":19,"id":null}'
+            '{"jsonrpc":"2.0","result":19,"id":null}',
         ], $this->middleware->getSeenResponses());
     }
 }

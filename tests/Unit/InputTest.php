@@ -27,7 +27,7 @@ final class InputTest extends TestCase
         return [
             'non empty array' => ['["wut"]'],
             'valid request' => ['{"jsonrpc": "2.0", "method": "subtract", "params": [42, 23], "id": 1}'],
-            'valid batch request' => ['[{"jsonrpc": "2.0", "method": "subtract", "params": [42, 23], "id": 1}]']
+            'valid batch request' => ['[{"jsonrpc": "2.0", "method": "subtract", "params": [42, 23], "id": 1}]'],
         ];
     }
 
@@ -49,7 +49,7 @@ final class InputTest extends TestCase
         return [
             [''],
             ['}"jsonrpc":"2.0'],
-            [\random_bytes(6)]
+            [\random_bytes(6)],
         ];
     }
 
@@ -75,7 +75,7 @@ final class InputTest extends TestCase
             'double' => ['1.2'],
             'string' => ['"foo"'],
             'empty string' => ['""'],
-            'empty array' => ['[]']
+            'empty array' => ['[]'],
         ];
     }
 }

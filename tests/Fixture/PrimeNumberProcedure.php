@@ -18,20 +18,20 @@ final class PrimeNumberProcedure implements JsonRpc\Procedure
     {
         return \json_decode(
             <<<'JSON'
-{
-  "$schema": "https://json-schema.org/draft-07/schema#",
+                {
+                  "$schema": "https://json-schema.org/draft-07/schema#",
 
-  "type": "object",
-  "required": ["number"],
-  "additionalProperties": false,
-  "properties": {
-    "number": {
-      "type": "integer",
-      "format": "prime"
-    }
-  }
-}
-JSON
+                  "type": "object",
+                  "required": ["number"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "number": {
+                      "type": "integer",
+                      "format": "prime"
+                    }
+                  }
+                }
+                JSON
         );
     }
 }
