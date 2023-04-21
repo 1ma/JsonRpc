@@ -20,8 +20,3 @@ jobs:
         run: vendor/bin/php-cs-fixer fix -v --dry-run
       - name: Execute test suite
         run: composer test
-      - name: Send coverage to Scrutinizer CI
-        if: ${{ always() && matrix.php-version == '8.1' }}
-        run: |
-          git config --global --add safe.directory /__w/JsonRpc/JsonRpc
-          php vendor/bin/ocular code-coverage:upload --format=php-clover build/coverage.xml
