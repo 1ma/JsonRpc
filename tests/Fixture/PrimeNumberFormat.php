@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace UMA\JsonRpc\Tests\Fixture;
 
 use Opis\JsonSchema\Format;
+
 use function is_int;
 
 final class PrimeNumberFormat implements Format

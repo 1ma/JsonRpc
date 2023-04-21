@@ -6,6 +6,7 @@ namespace UMA\JsonRpc\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 use UMA\JsonRpc\Success;
+
 use function json_encode;
 
 final class SuccessTest extends TestCase

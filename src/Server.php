@@ -16,6 +16,7 @@ use UMA\JsonRpc\Internal\Assert;
 use UMA\JsonRpc\Internal\Input;
 use UMA\JsonRpc\Internal\MiddlewareStack;
 use stdClass;
+
 use function array_key_exists;
 use function array_keys;
 use function array_map;

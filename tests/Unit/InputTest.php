@@ -6,6 +6,7 @@ namespace UMA\JsonRpc\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 use UMA\JsonRpc\Internal\Input;
+
 use function json_decode;
 use function random_bytes;
 

@@ -6,6 +6,7 @@ namespace UMA\JsonRpc\Internal;
 
 use Opis\JsonSchema\Validator as OpisValidator;
 use stdClass;
+
 use function assert;
 use function is_array;
 use function json_decode;
