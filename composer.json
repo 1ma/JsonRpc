@@ -1,5 +1,5 @@
 {
-    "name": "o-perator/json-rpc",
+    "name": "uma/json-rpc",
     "description": "a JSON-RPC 2.0 server",
     "license": "MIT",
     "type": "library",
