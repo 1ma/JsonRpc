@@ -6,6 +6,7 @@ namespace UMA\JsonRpc;
 
 use stdClass;
 use UMA\JsonRpc\Internal\Input;
+
 use function assert;
 
 final class Request implements \JsonSerializable

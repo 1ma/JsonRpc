@@ -6,6 +6,7 @@ namespace UMA\JsonRpc\Tests\Fixture;
 
 use stdClass;
 use UMA\JsonRpc;
+
 use function array_reduce;
 use function json_decode;
 
