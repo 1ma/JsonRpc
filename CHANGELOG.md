@@ -1,3 +1,7 @@
+### [4.1.0] - 2023-04-26
+
+* (Improvement) Support PHP 8.2, contributed by @o-perator
+
 ### [4.0.2] - 2022-06-18
 
 * (Improvement) Added capacity to pass additional error data to the "invalid params" error, contributed by @FTI-Herbert
@@ -64,6 +68,7 @@
 
   * Initial pre-release
 
+[4.1.0]: https://github.com/1ma/JsonRpc/compare/v4.0.2...v4.1.0
 [4.0.2]: https://github.com/1ma/JsonRpc/compare/v4.0.1...v4.0.2
 [4.0.1]: https://github.com/1ma/JsonRpc/compare/v4.0.0...v4.0.1
 [4.0.0]: https://github.com/1ma/JsonRpc/compare/v3.0.0...v4.0.0
