@@ -17,7 +17,7 @@ final class PrimeNumberFormat implements Format
         }
 
         $i = 2;
-        while ($i*$i <= $data) {
+        while ($i * $i <= $data) {
             if ($data % $i === 0) {
                 return false;
             }
