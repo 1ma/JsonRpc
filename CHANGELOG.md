@@ -1,3 +1,7 @@
+### [4.2.0] - 2024-02-22
+
+* (Improvement) Support PHP 8.3, contributed by @flameinthehead
+
 ### [4.1.0] - 2023-04-26
 
 * (Improvement) Support PHP 8.2, contributed by @o-perator
@@ -26,7 +30,7 @@
 * (Breaking Change) Raised minimum required version to PHP 7.3 and started to test lib for PHP 7.3, 7.4 and 8.0
 * (Breaking Change) Dropped simdjson decoding support.
 * (Improvement) Updated development dependencies
-* (Improvement) Decommissioned Travis CI in favor of Github Actions
+* (Improvement) Decommissioned Travis CI in favor of GitHub Actions
 
 ### [2.1.3] - 2020-08-24
 
@@ -68,6 +72,7 @@
 
   * Initial pre-release
 
+[4.2.0]: https://github.com/1ma/JsonRpc/compare/v4.1.0...v4.2.0
 [4.1.0]: https://github.com/1ma/JsonRpc/compare/v4.0.2...v4.1.0
 [4.0.2]: https://github.com/1ma/JsonRpc/compare/v4.0.1...v4.0.2
 [4.0.1]: https://github.com/1ma/JsonRpc/compare/v4.0.0...v4.0.1
