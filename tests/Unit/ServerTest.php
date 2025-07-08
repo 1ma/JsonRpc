@@ -146,18 +146,10 @@ final class ServerTest extends TestCase
 
     public function testPsr11ContainerException(): void
     {
-        /** @var MockObject|Container $container */
-        $container = $this->getMockBuilder(Container::class)
-            ->onlyMethods(['get'])
-            ->getMock();
-
-        $container->expects(self::once())
-            ->method('get')
-            ->with(Subtractor::class)
-            ->will(self::throwException(new class () extends RuntimeException implements ContainerExceptionInterface {
-            }));
-
-        $container->set(Subtractor::class, new Subtractor());
+        $container = new Container();
+        $container->set(Subtractor::class, function (): void {
+            throw new class () extends RuntimeException implements ContainerExceptionInterface {};
+        });
 
         $sut = new Server($container);
         $sut->set('subtract', Subtractor::class);

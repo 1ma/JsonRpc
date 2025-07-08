@@ -4,16 +4,18 @@ jobs:
   test:
     name: Run tests in PHP ${{ matrix.php-version }}
     runs-on: ubuntu-latest
-    container: 1maa/php-dev:${{ matrix.php-version }}
     strategy:
       fail-fast: false
       matrix:
-        php-version: ["8.0", "8.1", "8.2", "8.3"]
+        php-version: ["8.1", "8.2", "8.3", "8.4"]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 2
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
       - name: Install dependencies
         run: composer install
       - name: Run Linter
@@ -21,8 +23,6 @@ jobs:
       - name: Execute test suite
         run: composer test
       - name: Send coverage to Scrutinizer CI
-        if: ${{ always() && matrix.php-version == '8.2' }}
+        if: ${{ always() && matrix.php-version == '8.4' }}
         run: |
-          git config --global --add safe.directory /__w/JsonRpc/JsonRpc
           php vendor/bin/ocular code-coverage:upload --format=php-clover build/coverage.xml
-

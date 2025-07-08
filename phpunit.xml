@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.5/phpunit.xsd"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
          bootstrap="vendor/autoload.php"
          colors="true"
          beStrictAboutOutputDuringTests="true"
-         beStrictAboutTodoAnnotatedTests="true"
          cacheResult="false"
          executionOrder="depends,defects"
          failOnRisky="true"
          failOnWarning="true"
          testdox="true"
-         verbose="true"
 >
     <testsuites>
         <testsuite name="uma/json-rpc test suite">
@@ -18,10 +16,13 @@
         </testsuite>
     </testsuites>
 
-    <coverage processUncoveredFiles="true">
+    <source>
         <include>
-            <directory suffix=".php">src</directory>
+            <directory>src</directory>
         </include>
+    </source>
+
+    <coverage>
         <report>
             <clover outputFile="build/coverage.xml"/>
             <html outputDirectory="build/coverage"/>
