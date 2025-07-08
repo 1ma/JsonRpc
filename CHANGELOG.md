@@ -1,3 +1,8 @@
+### [5.0.0] - 2025-07-08
+
+* (Breaking Change) Bumped minimum version of PHP to 8.1
+* (Improvement) Support PHP 8.4
+
 ### [4.2.0] - 2024-02-22
 
 * (Improvement) Support PHP 8.3, contributed by @flameinthehead
@@ -72,6 +77,7 @@
 
   * Initial pre-release
 
+[5.0.0]: https://github.com/1ma/JsonRpc/compare/v4.2.0...v5.0.0
 [4.2.0]: https://github.com/1ma/JsonRpc/compare/v4.1.0...v4.2.0
 [4.1.0]: https://github.com/1ma/JsonRpc/compare/v4.0.2...v4.1.0
 [4.0.2]: https://github.com/1ma/JsonRpc/compare/v4.0.1...v4.0.2
