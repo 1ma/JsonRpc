@@ -35,7 +35,7 @@ final class Server
     private ?int $batchLimit;
     private ErrorFormatter $errorFormatter;
 
-    public function __construct(ContainerInterface $container, int $batchLimit = null)
+    public function __construct(ContainerInterface $container, ?int $batchLimit = null)
     {
         $this->container = $container;
         $this->batchLimit = $batchLimit;
@@ -191,7 +191,7 @@ final class Server
     /**
      * @throws JsonException
      */
-    private static function end(Response $response, Request $request = null): ?string
+    private static function end(Response $response, ?Request $request = null): ?string
     {
         return $request instanceof Request && null === $request->id() ?
             null : json_encode($response, JSON_THROW_ON_ERROR);

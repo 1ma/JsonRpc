@@ -24,6 +24,7 @@ return (new PhpCsFixer\Config())
         '@PHP81Migration' => true,
         '@PHP82Migration' => true,
         '@PHP83Migration' => true,
+        '@PHP84Migration' => true,
         '@PSR12' => true,
         '@PSR12:risky' => true,
     ]);
