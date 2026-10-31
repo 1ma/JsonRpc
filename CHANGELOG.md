@@ -1,3 +1,9 @@
+### [6.0.0] - 2026-11-01
+
+* (Breaking Change) Bumped minimum version of PHP to 8.2
+* (Breaking Change) Bumped minimum version of psr/container to 2.0
+* (Improvement) Support PHP 8.5 and 8.6
+
 ### [5.0.0] - 2025-07-08
 
 * (Breaking Change) Bumped minimum version of PHP to 8.1
@@ -77,6 +83,7 @@
 
   * Initial pre-release
 
+[6.0.0]: https://github.com/1ma/JsonRpc/compare/v5.0.0...v6.0.0
 [5.0.0]: https://github.com/1ma/JsonRpc/compare/v4.2.0...v5.0.0
 [4.2.0]: https://github.com/1ma/JsonRpc/compare/v4.1.0...v4.2.0
 [4.1.0]: https://github.com/1ma/JsonRpc/compare/v4.0.2...v4.1.0

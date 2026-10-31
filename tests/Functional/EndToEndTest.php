@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace UMA\JsonRpc\Tests\Functional;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use UMA\DIC\Container;
 use UMA\JsonRpc\Server;
@@ -13,9 +14,7 @@ use UMA\JsonRpc\Tests\Fixture\Subtractor;
 
 final class EndToEndTest extends TestCase
 {
-    /**
-     * @dataProvider specExamplesProvider
-     */
+    #[DataProvider('specExamplesProvider')]
     public function testRegularServer(string $input, ?string $expected): void
     {
         $container = new Container([
@@ -40,7 +39,7 @@ final class EndToEndTest extends TestCase
      *
      * @see http://www.jsonrpc.org/specification#examples
      */
-    public function specExamplesProvider(): array
+    public static function specExamplesProvider(): array
     {
         return [
             'rpc call with positional parameters #1' => [

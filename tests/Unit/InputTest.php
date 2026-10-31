@@ -4,25 +4,24 @@ declare(strict_types=1);
 
 namespace UMA\JsonRpc\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use UMA\JsonRpc\Internal\Input;
 
 final class InputTest extends TestCase
 {
-    /**
-     * @dataProvider validInputsProvider
-     */
+    #[DataProvider('validInputsProvider')]
     public function testValidInputs(string $raw): void
     {
         $sut = Input::fromString($raw);
 
         self::assertTrue($sut->parsable());
-        self::assertEquals($sut->data(), \json_decode($raw));
+        self::assertEquals($sut->data(), json_decode($raw));
 
         self::assertTrue($sut->isArray() || $sut->isRpcRequest());
     }
 
-    public function validInputsProvider(): array
+    public static function validInputsProvider(): array
     {
         return [
             'non empty array' => ['["wut"]'],
@@ -31,9 +30,7 @@ final class InputTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider parseErrorProvider
-     */
+    #[DataProvider('parseErrorProvider')]
     public function testInputParseError(string $raw): void
     {
         $sut = Input::fromString($raw);
@@ -44,29 +41,27 @@ final class InputTest extends TestCase
         self::assertFalse($sut->isArray());
     }
 
-    public function parseErrorProvider(): array
+    public static function parseErrorProvider(): array
     {
         return [
             [''],
             ['}"jsonrpc":"2.0'],
-            [\random_bytes(6)],
+            [random_bytes(6)],
         ];
     }
 
-    /**
-     * @dataProvider invalidInputsProvider
-     */
+    #[DataProvider('invalidInputsProvider')]
     public function testInvalidInputs(string $raw): void
     {
         $sut = Input::fromString($raw);
 
         self::assertTrue($sut->parsable());
-        self::assertEquals($sut->data(), \json_decode($raw));
+        self::assertEquals($sut->data(), json_decode($raw));
 
         self::assertFalse($sut->isArray());
     }
 
-    public function invalidInputsProvider(): array
+    public static function invalidInputsProvider(): array
     {
         return [
             'null' => ['null'],

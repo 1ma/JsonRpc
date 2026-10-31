@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace UMA\JsonRpc\Tests\Unit;
 
 use Opis\JsonSchema\Validator;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerExceptionInterface;
 use UMA\DIC\Container;

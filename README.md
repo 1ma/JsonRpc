@@ -1,8 +1,9 @@
 # JsonRpc
 
 [![Build Status](https://github.com/1ma/JsonRpc/workflows/.github/workflows/phpunit.yml/badge.svg)](https://github.com/1ma/JsonRpc/actions)
+[![Coverage](https://coveralls.io/repos/github/1ma/JsonRpc/badge.svg?branch=master)](https://coveralls.io/github/1ma/JsonRpc?branch=master)
 
-A modern, object-oriented [JSON-RPC 2.0] server for PHP 8.1+ featuring JSON Schema integration and middlewaring.
+A modern, object-oriented [JSON-RPC 2.0] server for PHP 8.2+ featuring JSON Schema integration and middlewaring.
 
 
 # Table of Contents

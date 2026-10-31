@@ -44,12 +44,12 @@ final class Input
 
     public static function fromString(string $raw): self
     {
-        return new self(\json_decode($raw), \json_last_error());
+        return new self(json_decode($raw), json_last_error());
     }
 
     public static function fromSafeData(mixed $data): self
     {
-        \assert(false !== \json_encode($data));
+        \assert(false !== json_encode($data));
 
         return new self($data, \JSON_ERROR_NONE);
     }

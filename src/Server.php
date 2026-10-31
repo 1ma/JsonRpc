@@ -104,7 +104,7 @@ final class Server
         }
 
         return empty($responses) ?
-            null : \sprintf('[%s]', \implode(',', $responses));
+            null : \sprintf('[%s]', implode(',', $responses));
     }
 
     /**
@@ -147,7 +147,7 @@ final class Server
 
         $stack = MiddlewareStack::compose(
             $procedure,
-            ...\array_map(fn (string $serviceId): Middleware => $this->container->get($serviceId), \array_keys($this->middlewares))
+            ...array_map(fn (string $serviceId): Middleware => $this->container->get($serviceId), array_keys($this->middlewares))
         );
 
         return self::end($stack($request), $request);
@@ -181,6 +181,6 @@ final class Server
     private static function end(Response $response, ?Request $request = null): ?string
     {
         return $request instanceof Request && null === $request->id() ?
-            null : \json_encode($response, \JSON_THROW_ON_ERROR);
+            null : json_encode($response, \JSON_THROW_ON_ERROR);
     }
 }

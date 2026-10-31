@@ -15,7 +15,7 @@ final class PrimeNumberProcedure implements JsonRpc\Procedure
 
     public function getSpec(): ?\stdClass
     {
-        return \json_decode(
+        return json_decode(
             <<<'JSON'
                 {
                   "$schema": "https://json-schema.org/draft-07/schema#",

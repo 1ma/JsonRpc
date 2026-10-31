@@ -12,7 +12,7 @@ final class Adder implements JsonRpc\Procedure
     {
         // $request->params() is *guaranteed* to be an array of
         // integers due to the JsonSchema defined in getSpec()
-        $sum = \array_reduce(
+        $sum = array_reduce(
             $request->params(),
             static fn (int $partialSum, int $number): int => $partialSum + $number,
             0
@@ -23,7 +23,7 @@ final class Adder implements JsonRpc\Procedure
 
     public function getSpec(): ?\stdClass
     {
-        return \json_decode(
+        return json_decode(
             <<<'JSON'
                 {
                   "$schema": "https://json-schema.org/draft-07/schema#",

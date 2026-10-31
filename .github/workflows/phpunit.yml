@@ -4,10 +4,12 @@ jobs:
   test:
     name: Run tests in PHP ${{ matrix.php-version }}
     runs-on: ubuntu-latest
+    env:
+      PHP_CS_FIXER_IGNORE_ENV: 1
     strategy:
       fail-fast: false
       matrix:
-        php-version: ["8.1", "8.2", "8.3", "8.4"]
+        php-version: ['8.2', '8.3', '8.4', '8.5', '8.6']
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -21,3 +23,9 @@ jobs:
         run: vendor/bin/php-cs-fixer fix -v --dry-run
       - name: Execute test suite
         run: composer test
+      - name: Upload code coverage results to Coveralls
+        if: ${{ matrix.php-version == '8.6' }}
+        uses: coverallsapp/github-action@8d6379e14d29928660c4ba802d8e85393440b329 # v2.3.8
+        with:
+          file: build/coverage.xml
+          format: clover
