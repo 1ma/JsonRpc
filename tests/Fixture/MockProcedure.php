@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace UMA\JsonRpc\Tests\Fixture;
 
-use stdClass;
 use UMA\JsonRpc;
 
 final class MockProcedure implements JsonRpc\Procedure
@@ -18,7 +17,7 @@ final class MockProcedure implements JsonRpc\Procedure
         return new JsonRpc\Success($request->id());
     }
 
-    public function getSpec(): ?stdClass
+    public function getSpec(): ?\stdClass
     {
         return null;
     }

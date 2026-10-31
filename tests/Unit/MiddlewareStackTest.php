@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace UMA\JsonRpc\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
-use stdClass;
 use UMA\JsonRpc\Internal\Input;
 use UMA\JsonRpc\Internal\MiddlewareStack;
 use UMA\JsonRpc\Request;
@@ -28,7 +27,7 @@ final class MiddlewareStackTest extends TestCase
         self::assertNotSame($procedure, $stack);
         self::assertNull($stack->getSpec());
 
-        $payload = new stdClass();
+        $payload = new \stdClass();
         $payload->jsonrpc = '2.0';
         $payload->method = 'adder';
         $payload->params = [1, 2, 3];

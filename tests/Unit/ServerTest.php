@@ -4,14 +4,10 @@ declare(strict_types=1);
 
 namespace UMA\JsonRpc\Tests\Unit;
 
-use Error;
-use LogicException;
 use Opis\JsonSchema\Validator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerExceptionInterface;
-use RuntimeException;
-use TypeError;
 use UMA\DIC\Container;
 use UMA\JsonRpc\Server;
 use UMA\JsonRpc\Tests\Fixture\LoggingMiddleware;
@@ -32,21 +28,21 @@ final class ServerTest extends TestCase
 
     public function testAddingANonExistentProcedureService(): void
     {
-        $this->expectException(LogicException::class);
+        $this->expectException(\LogicException::class);
 
         $this->sut->set('subtract', Subtractor::class);
     }
 
     public function testAddingANonExistentMiddlewareService(): void
     {
-        $this->expectException(LogicException::class);
+        $this->expectException(\LogicException::class);
 
         $this->sut->attach(LoggingMiddleware::class);
     }
 
     public function testInvalidProcedureService(): void
     {
-        $this->expectException(TypeError::class);
+        $this->expectException(\TypeError::class);
 
         $this->container->set(Subtractor::class, 'this is not a Procedure!');
 
@@ -57,7 +53,7 @@ final class ServerTest extends TestCase
 
     public function testInvalidMiddleware(): void
     {
-        $this->expectException(TypeError::class);
+        $this->expectException(\TypeError::class);
 
         $this->container->set(Subtractor::class, new Subtractor());
         $this->container->set(LoggingMiddleware::class, 'This is not a Middleware!');
@@ -134,7 +130,7 @@ final class ServerTest extends TestCase
 
     public function testExceptionBubblesUpOnValidatorExtensionBadUsage(): void
     {
-        $this->expectException(Error::class);
+        $this->expectException(\Error::class);
         $this->expectExceptionMessage('Call to a member function validate() on string');
 
         $this->container->set(Validator::class, 'what is even that');
@@ -147,8 +143,8 @@ final class ServerTest extends TestCase
     public function testPsr11ContainerException(): void
     {
         $container = new Container();
-        $container->set(Subtractor::class, function (): void {
-            throw new class () extends RuntimeException implements ContainerExceptionInterface {};
+        $container->set(Subtractor::class, static function (): void {
+            throw new class extends \RuntimeException implements ContainerExceptionInterface {};
         });
 
         $sut = new Server($container);

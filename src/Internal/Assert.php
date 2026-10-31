@@ -12,7 +12,7 @@ final class Assert
     /**
      * Throws a TypeError exception if $thingy is not a Procedure.
      *
-     * @throws TypeError
+     * @throws \TypeError
      */
     public static function isProcedure(Procedure $thingy): Procedure
     {

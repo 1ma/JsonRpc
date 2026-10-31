@@ -6,8 +6,6 @@ namespace UMA\JsonRpc\Tests\Fixture;
 
 use UMA\JsonRpc;
 
-use function json_encode;
-
 final class LoggingMiddleware implements JsonRpc\Middleware
 {
     /**
@@ -22,11 +20,11 @@ final class LoggingMiddleware implements JsonRpc\Middleware
 
     public function __invoke(JsonRpc\Request $request, JsonRpc\Procedure $next): JsonRpc\Response
     {
-        $this->requests[] = json_encode($request);
+        $this->requests[] = \json_encode($request);
 
         $response = $next($request);
 
-        $this->responses[] = json_encode($response);
+        $this->responses[] = \json_encode($response);
 
         return $response;
     }

@@ -4,21 +4,18 @@ declare(strict_types=1);
 
 namespace UMA\JsonRpc;
 
-use stdClass;
 use UMA\JsonRpc\Internal\Input;
-
-use function assert;
 
 final class Request implements \JsonSerializable
 {
     private mixed $raw;
     private int|string|null $id;
     private string $method;
-    private stdClass|array|null $params;
+    private \stdClass|array|null $params;
 
     public function __construct(Input $input)
     {
-        assert($input->isRpcRequest());
+        \assert($input->isRpcRequest());
 
         $this->raw = $input->data();
 
@@ -37,7 +34,7 @@ final class Request implements \JsonSerializable
         return $this->method;
     }
 
-    public function params(): stdClass|array|null
+    public function params(): \stdClass|array|null
     {
         return $this->params;
     }

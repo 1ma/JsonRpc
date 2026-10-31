@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace UMA\JsonRpc\Internal;
 
-use stdClass;
 use UMA\JsonRpc;
 
 final class MiddlewareStack implements JsonRpc\Procedure
@@ -29,18 +28,12 @@ final class MiddlewareStack implements JsonRpc\Procedure
         $this->next = $next;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __invoke(JsonRpc\Request $request): JsonRpc\Response
     {
         return ($this->middleware)($request, $this->next);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getSpec(): ?stdClass
+    public function getSpec(): ?\stdClass
     {
         return null;
     }

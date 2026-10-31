@@ -18,34 +18,34 @@ final class Error extends Response
         $this->id = $id;
     }
 
-    public static function parsing(): Error
+    public static function parsing(): self
     {
-        return new Error(-32700, 'Parse error');
+        return new self(-32700, 'Parse error');
     }
 
-    public static function invalidRequest(): Error
+    public static function invalidRequest(): self
     {
-        return new Error(-32600, 'Invalid Request');
+        return new self(-32600, 'Invalid Request');
     }
 
-    public static function unknownMethod($id): Error
+    public static function unknownMethod($id): self
     {
-        return new Error(-32601, 'Method not found', null, $id);
+        return new self(-32601, 'Method not found', null, $id);
     }
 
-    public static function invalidParams($id, mixed $data = null): Error
+    public static function invalidParams($id, mixed $data = null): self
     {
-        return new Error(-32602, 'Invalid params', $data, $id);
+        return new self(-32602, 'Invalid params', $data, $id);
     }
 
-    public static function internal($id): Error
+    public static function internal($id): self
     {
-        return new Error(-32603, 'Internal error', null, $id);
+        return new self(-32603, 'Internal error', null, $id);
     }
 
-    public static function tooManyBatchRequests(int $limit): Error
+    public static function tooManyBatchRequests(int $limit): self
     {
-        return new Error(-32000, 'Too many batch requests sent to server', ['limit' => $limit]);
+        return new self(-32000, 'Too many batch requests sent to server', ['limit' => $limit]);
     }
 
     public function jsonSerialize(): array

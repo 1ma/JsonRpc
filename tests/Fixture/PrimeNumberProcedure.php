@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 namespace UMA\JsonRpc\Tests\Fixture;
 
-use stdClass;
 use UMA\JsonRpc;
-
-use function json_decode;
 
 final class PrimeNumberProcedure implements JsonRpc\Procedure
 {
@@ -16,9 +13,9 @@ final class PrimeNumberProcedure implements JsonRpc\Procedure
         return new JsonRpc\Success($request->id(), 'this is a prime number');
     }
 
-    public function getSpec(): ?stdClass
+    public function getSpec(): ?\stdClass
     {
-        return json_decode(
+        return \json_decode(
             <<<'JSON'
                 {
                   "$schema": "https://json-schema.org/draft-07/schema#",

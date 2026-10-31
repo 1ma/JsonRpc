@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace UMA\JsonRpc;
 
-use JsonException;
-use LogicException;
 use Opis\JsonSchema\Errors\ErrorFormatter;
 use Opis\JsonSchema\ValidationResult;
 use Opis\JsonSchema\Validator as OpisValidator;
@@ -15,17 +13,6 @@ use Psr\Container\NotFoundExceptionInterface;
 use UMA\JsonRpc\Internal\Assert;
 use UMA\JsonRpc\Internal\Input;
 use UMA\JsonRpc\Internal\MiddlewareStack;
-use stdClass;
-
-use function array_key_exists;
-use function array_keys;
-use function array_map;
-use function assert;
-use function count;
-use function implode;
-use function is_int;
-use function json_encode;
-use function sprintf;
 
 final class Server
 {
@@ -44,10 +31,10 @@ final class Server
         $this->errorFormatter = new ErrorFormatter();
     }
 
-    public function set(string $method, string $serviceId): Server
+    public function set(string $method, string $serviceId): self
     {
         if (!$this->container->has($serviceId)) {
-            throw new LogicException("Cannot find service '$serviceId' in the container");
+            throw new \LogicException("Cannot find service '$serviceId' in the container");
         }
 
         $this->methods[$method] = $serviceId;
@@ -55,10 +42,10 @@ final class Server
         return $this;
     }
 
-    public function attach(string $serviceId): Server
+    public function attach(string $serviceId): self
     {
         if (!$this->container->has($serviceId)) {
-            throw new LogicException("Cannot find service '$serviceId' in the container");
+            throw new \LogicException("Cannot find service '$serviceId' in the container");
         }
 
         $this->middlewares[$serviceId] = null;
@@ -69,7 +56,7 @@ final class Server
     /**
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
-     * @throws JsonException
+     * @throws \JsonException
      */
     public function run(string $raw): ?string
     {
@@ -101,11 +88,11 @@ final class Server
     /**
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
-     * @throws JsonException
+     * @throws \JsonException
      */
     private function batch(Input $input): ?string
     {
-        assert($input->isArray());
+        \assert($input->isArray());
 
         $responses = [];
         foreach ($input->data() as $request) {
@@ -117,12 +104,12 @@ final class Server
         }
 
         return empty($responses) ?
-            null : sprintf('[%s]', implode(',', $responses));
+            null : \sprintf('[%s]', \implode(',', $responses));
     }
 
     /**
      * @throws ContainerExceptionInterface
-     * @throws JsonException
+     * @throws \JsonException
      * @throws NotFoundExceptionInterface
      */
     private function single(Input $input): ?string
@@ -133,7 +120,7 @@ final class Server
 
         $request = new Request($input);
 
-        if (!array_key_exists($request->method(), $this->methods)) {
+        if (!\array_key_exists($request->method(), $this->methods)) {
             return self::end(Error::unknownMethod($request->id()), $request);
         }
 
@@ -141,11 +128,11 @@ final class Server
             $procedure = Assert::isProcedure(
                 $this->container->get($this->methods[$request->method()])
             );
-        } catch (ContainerExceptionInterface | NotFoundExceptionInterface) {
+        } catch (ContainerExceptionInterface|NotFoundExceptionInterface) {
             return self::end(Error::internal($request->id()), $request);
         }
 
-        if ($procedure->getSpec() instanceof stdClass) {
+        if ($procedure->getSpec() instanceof \stdClass) {
             $validatorResult = $this->validate($procedure->getSpec(), $request->params());
             if (!$validatorResult->isValid()) {
                 return self::end(
@@ -160,19 +147,19 @@ final class Server
 
         $stack = MiddlewareStack::compose(
             $procedure,
-            ...array_map(fn (string $serviceId): Middleware => $this->container->get($serviceId), array_keys($this->middlewares))
+            ...\array_map(fn (string $serviceId): Middleware => $this->container->get($serviceId), \array_keys($this->middlewares))
         );
 
         return self::end($stack($request), $request);
     }
 
     /**
-     * @param stdClass $schema The schema to check against the given data.
-     * @param mixed $data The data to validate (MUST be decoded JSON data).
+     * @param \stdClass $schema the schema to check against the given data
+     * @param mixed     $data   the data to validate (MUST be decoded JSON data)
      *
      * @return ValidationResult Whether $data conforms to $schema or not
      */
-    private function validate(stdClass $schema, mixed $data): ValidationResult
+    private function validate(\stdClass $schema, mixed $data): ValidationResult
     {
         try {
             return $this->container->get(OpisValidator::class)->validate($data, $schema);
@@ -183,17 +170,17 @@ final class Server
 
     private function tooManyBatchRequests(Input $input): bool
     {
-        assert($input->isArray());
+        \assert($input->isArray());
 
-        return is_int($this->batchLimit) && $this->batchLimit < count($input->data());
+        return \is_int($this->batchLimit) && $this->batchLimit < \count($input->data());
     }
 
     /**
-     * @throws JsonException
+     * @throws \JsonException
      */
     private static function end(Response $response, ?Request $request = null): ?string
     {
         return $request instanceof Request && null === $request->id() ?
-            null : json_encode($response, JSON_THROW_ON_ERROR);
+            null : \json_encode($response, \JSON_THROW_ON_ERROR);
     }
 }

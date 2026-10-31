@@ -7,9 +7,6 @@ namespace UMA\JsonRpc\Tests\Unit;
 use PHPUnit\Framework\TestCase;
 use UMA\JsonRpc\Internal\Input;
 
-use function json_decode;
-use function random_bytes;
-
 final class InputTest extends TestCase
 {
     /**
@@ -20,7 +17,7 @@ final class InputTest extends TestCase
         $sut = Input::fromString($raw);
 
         self::assertTrue($sut->parsable());
-        self::assertEquals($sut->data(), json_decode($raw));
+        self::assertEquals($sut->data(), \json_decode($raw));
 
         self::assertTrue($sut->isArray() || $sut->isRpcRequest());
     }
@@ -52,7 +49,7 @@ final class InputTest extends TestCase
         return [
             [''],
             ['}"jsonrpc":"2.0'],
-            [random_bytes(6)],
+            [\random_bytes(6)],
         ];
     }
 
@@ -64,7 +61,7 @@ final class InputTest extends TestCase
         $sut = Input::fromString($raw);
 
         self::assertTrue($sut->parsable());
-        self::assertEquals($sut->data(), json_decode($raw));
+        self::assertEquals($sut->data(), \json_decode($raw));
 
         self::assertFalse($sut->isArray());
     }

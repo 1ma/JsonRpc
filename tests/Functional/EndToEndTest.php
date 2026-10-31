@@ -8,8 +8,8 @@ use PHPUnit\Framework\TestCase;
 use UMA\DIC\Container;
 use UMA\JsonRpc\Server;
 use UMA\JsonRpc\Tests\Fixture\Adder;
-use UMA\JsonRpc\Tests\Fixture\Subtractor;
 use UMA\JsonRpc\Tests\Fixture\MockProcedure;
+use UMA\JsonRpc\Tests\Fixture\Subtractor;
 
 final class EndToEndTest extends TestCase
 {
